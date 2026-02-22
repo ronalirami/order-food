@@ -70,11 +70,11 @@ export default function TentangPage() {
             desc: "Didirikan tahun 2024 di Kagawa, menggabungkan semangat perantauan dan kecintaan pada kuliner Nusantara.",
           },
           {
-            title: "🍛 Rasa Autentik Minang",
+            title: "Rasa Autentik Minang",
             desc: "Semua resep berasal dari dapur tradisional Minangkabau — mempertahankan bumbu asli dan teknik memasak turun-temurun.",
           },
           {
-            title: "🤝 Harmonis Budaya",
+            title: "Harmoni Budaya",
             desc: "Menghadirkan nuansa Minang yang berpadu dengan keramahan dan estetika Jepang.",
           },
         ].map((card, index) => (
