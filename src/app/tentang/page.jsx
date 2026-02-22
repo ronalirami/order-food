@@ -74,7 +74,7 @@ export default function TentangPage() {
             desc: "Semua resep berasal dari dapur tradisional Minangkabau — mempertahankan bumbu asli dan teknik memasak turun-temurun.",
           },
           {
-            title: "🤝 Harmoni Budaya",
+            title: "🤝 Harmonis Budaya",
             desc: "Menghadirkan nuansa Minang yang berpadu dengan keramahan dan estetika Jepang.",
           },
         ].map((card, index) => (
