@@ -16,7 +16,7 @@ export default function HomePage(){
         alt="Menu utama"
         fill
         priority
-        className="object-cover brightness-60"
+        className="object-cover brightness-30"
         />
         
         <div className="absolute inset-0 flex flex-col justify-end pb-16 px-16 text-white z-10">
