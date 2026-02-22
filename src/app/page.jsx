@@ -19,7 +19,7 @@ export default function HomePage(){
         className="object-cover brightness-30"
         />
         
-        <div className="absolute inset-0 flex flex-col justify-end pb-16 px-16 text-white z-10">
+        <div className="absolute inset-0 flex flex-col justify-end pb-16 px-16 text-white0 z-10">
           <h1 className="text-6xl font-serif tracking-wide text-[#F4EAD0] mb-4">
             NasiPadang <br /> MARANTAU
           </h1>

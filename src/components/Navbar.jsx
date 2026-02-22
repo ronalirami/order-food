@@ -41,9 +41,10 @@ export default function Navbar({ fontTitle }) {
           </button>
 
           {/* Logo */}
-          <h1 className="font-serif tracking-widest text-[#F4EAD0] text-base sm:text-lg font-semibold">
+          <Link href="/"><h1 className="font-serif tracking-widest text-[#F4EAD0] text-base sm:text-lg font-semibold">
             RM.LamakBana
           </h1>
+          </Link>
         </div>
 
         {/* === Menu utama (hanya desktop) === */}
