@@ -66,33 +66,49 @@ export default function MenuPage() {
             </h2>
 
             {/* Daftar menu */}
-            <div className="flex flex-col gap-8">
-              {items.map((item, index) => (
-                <motion.div
-                  key={index}
-                  whileHover={{ scale: 1.02 }}
-                  className="flex flex-col sm:flex-row items-center gap-6 border-b border-gray-800 pb-6"
-                >
-                  <div className="relative w-full sm:w-28 h-40 sm:h-24 rounded-lg overflow-hidden">
-                    <Image
-                      src={item.gambar}
-                      alt={item.nama}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 text-center sm:text-left">
-                    <h3 className="text-xl font-semibold text-[#F4EAD0]">
-                      {item.nama}
-                    </h3>
-                    <p className="text-gray-400 text-sm">{item.deskripsi}</p>
-                  </div>
-                  <div className="text-[#F4EAD0] text-lg font-medium">
-                    {item.harga}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+            {/* Daftar menu */}
+<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
+  {items.map((item, index) => (
+    <motion.div
+      key={index}
+      whileHover={{ y: -5 }}
+      className="bg-[#111] rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300"
+    >
+      {/* Gambar */}
+      <div className="relative w-full h-56 overflow-hidden">
+        <Image
+          src={item.gambar}
+          alt={item.nama}
+          fill
+          className="object-cover hover:scale-105 transition duration-500"
+        />
+      </div>
+
+      {/* Konten */}
+      <div className="p-6 flex flex-col justify-between h-48">
+        <div>
+          <h3 className="text-xl font-semibold text-[#F4EAD0] mb-2">
+            {item.nama}
+          </h3>
+          <p className="text-gray-400 text-sm line-clamp-3">
+            {item.deskripsi}
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between mt-4">
+          <span className="text-[#F4EAD0] font-bold text-lg">
+            {item.harga}
+          </span>
+
+          <button className="bg-[#F4EAD0] text-black px-4 py-1 rounded-full text-sm font-semibold hover:bg-white transition">
+            + Tambah
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  ))}
+</div>
+
           </motion.div>
         ))}
       </Container> 
