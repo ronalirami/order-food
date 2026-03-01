@@ -42,7 +42,7 @@ export default function MenuPage() {
           "Tulang sapi dengan daging lembut disajikan dengan kuah santan kental dan harum.",
         harga: "¥1300",
         gambar: "/images/dendeng.jpg",
-        
+
       },
     ],
   };
@@ -80,7 +80,6 @@ export default function MenuPage() {
               {kategori.charAt(0).toUpperCase() + kategori.slice(1)}
             </h2>
 
-            {/* Daftar menu */}
             {/* Daftar menu */}
 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
   {items.map((item, index) => (
