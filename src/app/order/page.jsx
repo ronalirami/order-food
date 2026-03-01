@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -6,6 +7,9 @@ import { motion } from "framer-motion";
 export default function OrderPage() {
   const [cart, setCart] = useState([]);
 
+  // =========================
+  // DATA MENU
+  // =========================
   const menuItems = [
     {
       id: 1,
@@ -13,7 +17,7 @@ export default function OrderPage() {
       deskripsi:
         "Dimasak perlahan dengan bumbu rempah khas Minang hingga daging empuk dan beraroma harum.",
       harga: 1200,
-      gambar: "/images/rendang.jpg",
+      gambar: "/images/heroside1.jpg",
     },
     {
       id: 2,
@@ -33,9 +37,19 @@ export default function OrderPage() {
     },
   ];
 
+  // =========================
+  // FORMAT YEN (ANTI HYDRATION ERROR)
+  // =========================
+  const formatYen = (number) =>
+    new Intl.NumberFormat("ja-JP").format(number);
+
+  // =========================
+  // TAMBAH KE CART
+  // =========================
   const addToCart = (item) => {
     setCart((prev) => {
       const existing = prev.find((i) => i.id === item.id);
+
       if (existing) {
         return prev.map((i) =>
           i.id === item.id ? { ...i, qty: i.qty + 1 } : i
@@ -46,25 +60,68 @@ export default function OrderPage() {
     });
   };
 
-  const totalHarga = cart.reduce((sum, i) => sum + i.harga * i.qty, 0);
+  // =========================
+  // TAMBAH QTY
+  // =========================
+  const increaseQty = (id) => {
+    setCart((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, qty: item.qty + 1 } : item
+      )
+    );
+  };
+
+  // =========================
+  // KURANGI QTY
+  // =========================
+  const decreaseQty = (id) => {
+    setCart((prev) =>
+      prev
+        .map((item) =>
+          item.id === id ? { ...item, qty: item.qty - 1 } : item
+        )
+        .filter((item) => item.qty > 0)
+    );
+  };
+
+  // =========================
+  // HAPUS ITEM
+  // =========================
+  const removeFromCart = (id) => {
+    setCart((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  // =========================
+  // TOTAL
+  // =========================
+  const totalHarga = cart.reduce(
+    (sum, item) => sum + item.harga * item.qty,
+    0
+  );
 
   return (
     <section className="min-h-screen bg-black text-white px-6 md:px-20 py-16">
-      {/* === Judul Halaman === */}
+      {/* ========================= */}
+      {/* JUDUL */}
+      {/* ========================= */}
       <motion.div
         initial={{ opacity: 0, y: -40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
         className="text-center mb-12"
       >
-        <h1 className="text-5xl font-serif text-[#F4EAD0] mb-3">Order Sekarang</h1>
+        <h1 className="text-5xl font-serif text-[#F4EAD0] mb-3">
+          Order Sekarang
+        </h1>
         <p className="text-gray-400">
           Pilih menu favorit Anda dan pesan langsung dari meja.
         </p>
       </motion.div>
 
       <div className="flex flex-col md:flex-row gap-12">
-        {/* === Daftar Menu === */}
+        {/* ========================= */}
+        {/* DAFTAR MENU */}
+        {/* ========================= */}
         <div className="flex-1">
           {menuItems.map((item) => (
             <motion.div
@@ -83,15 +140,17 @@ export default function OrderPage() {
                   className="object-cover"
                 />
               </div>
+
               <div className="flex-1">
                 <h3 className="text-xl font-semibold text-[#F4EAD0]">
                   {item.nama}
                 </h3>
                 <p className="text-gray-400 text-sm">{item.deskripsi}</p>
                 <p className="text-[#F4EAD0] mt-2 font-medium">
-                  ¥{item.harga.toLocaleString()}
+                  ¥{formatYen(item.harga)}
                 </p>
               </div>
+
               <button
                 onClick={() => addToCart(item)}
                 className="bg-[#F4EAD0] text-black px-4 py-2 rounded-lg hover:bg-white transition"
@@ -102,33 +161,69 @@ export default function OrderPage() {
           ))}
         </div>
 
-        {/* === Keranjang Pesanan === */}
+        {/* ========================= */}
+        {/* KERANJANG */}
+        {/* ========================= */}
         <div className="w-full md:w-1/3 bg-[#111] p-6 rounded-2xl h-fit sticky top-16 shadow-lg">
-          <h2 className="text-2xl font-serif text-[#F4EAD0] mb-4">Keranjang</h2>
+          <h2 className="text-2xl font-serif text-[#F4EAD0] mb-4">
+            Keranjang
+          </h2>
+
           {cart.length === 0 ? (
             <p className="text-gray-400">Belum ada pesanan.</p>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-5">
               {cart.map((item) => (
-                <div key={item.id} className="flex justify-between items-center">
-                  <div>
+                <div
+                  key={item.id}
+                  className="border-b border-gray-700 pb-4"
+                >
+                  <div className="flex justify-between">
                     <p className="font-medium">{item.nama}</p>
-                    <p className="text-sm text-gray-400">
-                      {item.qty} × ¥{item.harga.toLocaleString()}
+
+                    <button
+                      onClick={() => removeFromCart(item.id)}
+                      className="text-red-400 hover:text-red-600 text-sm"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  <div className="flex justify-between items-center mt-2">
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => decreaseQty(item.id)}
+                        className="px-2 bg-gray-700 rounded hover:bg-gray-600"
+                      >
+                        −
+                      </button>
+
+                      <span>{item.qty}</span>
+
+                      <button
+                        onClick={() => increaseQty(item.id)}
+                        className="px-2 bg-gray-700 rounded hover:bg-gray-600"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <p className="text-[#F4EAD0]">
+                      ¥{formatYen(item.harga * item.qty)}
                     </p>
                   </div>
-                  <p className="text-[#F4EAD0]">
-                    ¥{(item.harga * item.qty).toLocaleString()}
-                  </p>
                 </div>
               ))}
-              <div className="border-t border-gray-700 pt-4 mt-4 flex justify-between">
+
+              {/* TOTAL */}
+              <div className="border-t border-gray-700 pt-4 flex justify-between">
                 <span className="text-gray-400">Total</span>
                 <span className="text-[#F4EAD0] font-semibold">
-                  ¥{totalHarga.toLocaleString()}
+                  ¥{formatYen(totalHarga)}
                 </span>
               </div>
 
+              {/* BUTTON */}
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
