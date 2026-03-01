@@ -29,6 +29,21 @@ export default function MenuPage() {
         harga: "¥1300",
         gambar: "/images/gulai-tunjang.jpg",
       },
+      {
+        nama: "Gulai Ayam",
+        deskripsi:
+          "Tulang sapi dengan daging lembut disajikan dengan kuah santan kental dan harum.",
+        harga: "¥1300",
+        gambar: "/images/gulai-ayam.jpg",
+      },
+      {
+        nama: "Dendeng balado",
+        deskripsi:
+          "Tulang sapi dengan daging lembut disajikan dengan kuah santan kental dan harum.",
+        harga: "¥1300",
+        gambar: "/images/dendeng.jpg",
+        
+      },
     ],
   };
 
