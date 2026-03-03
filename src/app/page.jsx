@@ -4,20 +4,28 @@ import heroMain from "@/assets/images/hero-main.png";
 import heroSide1 from "@/assets/images/hero-side1.jpg";
 import heroSide2 from "@/assets/images/hero-side2.jpg";
 import heroSide3 from "@/assets/images/hero-side3.jpg";
+
 export default function HomePage() {
   return (
-    <section className="w-full h-screen flex overflow-hidden ">
-      {/* Left Hero */}
+    <section className="w-full h-screen flex overflow-hidden">
+      {/* LEFT HERO */}
       <div className="relative flex-1 rounded-2xl overflow-hidden mr-2">
         <Image
           src={heroMain}
-          alt="Hero"
+          alt="Menu Utama"
           fill
+          priority
           className="object-cover brightness-50"
         />
+        <div className="absolute inset-0 flex items-end px-16 pb-16 z-10">
+          <h1 className="text-6xl font-serif text-[#F4EAD0] drop-shadow-lg">
+            NasiPadang <br /> MARANTAU
+          </h1>
+        </div>
+
       </div>
 
-      {/* Right Grid */}
+      {/* RIGHT GRID */}
       <div className="w-1/4 grid grid-rows-3 gap-2">
         <HeroCard image={heroSide1} link="/menu" label="Menu" />
         <HeroCard image={heroSide2} link="/order" label="Reservasi" />
@@ -32,7 +40,7 @@ function HeroCard({ image, link, label }) {
     <div className="relative rounded-xl overflow-hidden group">
       <Image
         src={image}
-        alt="label"
+        alt={label}
         fill
         className="object-cover transition-transform duration-500 group-hover:scale-105"
       />
@@ -47,7 +55,6 @@ function HeroCard({ image, link, label }) {
           {label}
         </Link>
       </div>
-
     </div>
   );
 }
