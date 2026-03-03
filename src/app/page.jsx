@@ -27,17 +27,26 @@ export default function HomePage() {
   );
 }
 
-function HeroCard({ image }) {
+function HeroCard({ image, link, label }) {
   return (
-    <div className="relative">
+    <div className="relative rounded-xl overflow-hidden group">
       <Image
         src={image}
-        alt="Hero"
+        alt="label"
         fill
-        className="object-cover"
+        className="object-cover transition-transform duration-500 group-hover:scale-105"
       />
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+
+      <div className="absolute bottom-4 right-4">
+        <Link
+          href={link}
+          className="text-white border border-white px-3 py-1 rounded-full hover:bg-white hover:text-black transition"
+        >
+          {label}
+        </Link>
+      </div>
 
     </div>
   );
