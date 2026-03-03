@@ -1,114 +1,129 @@
 "use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import chefImg from "@/assets/images/hero-side2.jpg"; // ganti nanti dengan foto asli dapur/tim
+import chefImg from "@/assets/images/hero-side2.jpg";
 
 export default function TentangPage() {
   return (
-    <section className="min-h-screen bg-black text-white px-12 py-20 flex flex-col items-center">
-      {/* === JUDUL HALAMAN === */}
-      <motion.div
-        initial={{ opacity: 0, y: -40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="text-center mb-16"
-      >
-        <h1 className="text-5xl font-serif text-[#F4EAD0] mb-3">TENTANG KAMI</h1>
-        <p className="text-gray-400 max-w-2xl mx-auto">
-          Kami membawa cita rasa Minangkabau ke Jepang dengan sentuhan modern —
-          menghadirkan pengalaman makan yang hangat, autentik, dan elegan.
-        </p>
-      </motion.div>
+    <section className="bg-black text-white">
+      
+      {/* ================= HERO SECTION ================= */}
+      <div className="relative h-[60vh] w-full overflow-hidden">
+        <Image
+          src={chefImg}
+          alt="Dapur dan tim Lamak Bana"
+          fill
+          priority
+          className="object-cover brightness-50"
+        />
 
-      {/* === FOTO + FILOSOFI === */}
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
-        viewport={{ once: true }}
-        className="flex gap-12 max-lg:flex-col items-center mb-20"
-      >
-        <div className="relative w-1/2 h-[400px] rounded-2xl overflow-hidden max-lg:w-full">
-          <Image
-            src={chefImg}
-            alt="Dapur dan tim Lamak Bana"
-            fill
-            className="object-cover brightness-90"
-          />
-        </div>
-
-        <div className="w-1/2 max-lg:w-full">
-          <h2 className="text-2xl font-semibold text-[#F4EAD0] mb-3">
-            Filosofi “Lamak Bana”
-          </h2>
-          <p className="text-gray-300 leading-relaxed mb-4">
-            Dalam bahasa Minang, “Lamak Bana” berarti *teramat lezat*.  
-            Filosofi ini menggambarkan dedikasi kami dalam setiap proses —
-            dari pemilihan bahan, cara memasak, hingga penyajian di meja Anda.
-          </p>
-          <p className="text-gray-400 leading-relaxed">
-            Didirikan oleh perantau Minang di Jepang, kami berkomitmen menjaga cita rasa asli 
-            sekaligus menyesuaikannya dengan kehalusan budaya Jepang.  
-            Kami percaya, makanan bukan hanya soal rasa, tapi juga tentang cerita, tradisi, dan kebersamaan.
-          </p>
-        </div>
-      </motion.div>
-
-      {/* === HIGHLIGHT CARD === */}
-      <motion.div
-        initial={{ opacity: 0, y: 60 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, delay: 0.3 }}
-        viewport={{ once: true }}
-        className="grid grid-cols-3 gap-6 text-center max-lg:grid-cols-1 w-full max-w-6xl"
-      >
-        {[
-          {
-            title: "🇯🇵 Berdiri di Jepang",
-            desc: "Didirikan tahun 2024 di Kagawa, menggabungkan semangat perantauan dan kecintaan pada kuliner Nusantara.",
-          },
-          {
-            title: "Rasa Autentik Minang",
-            desc: "Semua resep berasal dari dapur tradisional Minangkabau — mempertahankan bumbu asli dan teknik memasak turun-temurun.",
-          },
-          {
-            title: "Harmoni Budaya",
-            desc: "Menghadirkan nuansa Minang yang berpadu dengan keramahan dan estetika Jepang.",
-          },
-        ].map((card, index) => (
+        <div className="absolute inset-0 flex items-center justify-center text-center px-6">
           <motion.div
-            key={index}
-            whileHover={{ scale: 1.03 }}
-            className="bg-[#111] p-8 rounded-2xl hover:bg-[#1a1a1a] transition"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
           >
-            <h3 className="text-[#F4EAD0] text-xl font-semibold mb-2">
-              {card.title}
-            </h3>
-            <p className="text-gray-400 text-sm">{card.desc}</p>
+            <h1 className="text-5xl md:text-6xl font-serif text-[#F4EAD0] mb-4 tracking-wide">
+              Tentang Kami
+            </h1>
+            <p className="text-gray-300 max-w-2xl mx-auto">
+              Membawa kehangatan Minangkabau ke Jepang dengan sentuhan elegan dan modern.
+            </p>
           </motion.div>
-        ))}
-      </motion.div>
+        </div>
+      </div>
 
-      {/* === CTA === */}
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.4 }}
-        viewport={{ once: true }}
-        className="mt-20 text-center"
-      >
-        <h2 className="text-2xl font-serif text-[#F4EAD0] mb-4">
-          Siap merasakan kelezatan sejati?
-        </h2>
-        <Link
-          href="/order"
-          className="inline-block bg-[#F4EAD0] text-black px-8 py-3 rounded-lg text-lg font-medium hover:bg-white transition"
+      {/* ================= FILOSOFI SECTION ================= */}
+      <div className="max-w-6xl mx-auto px-6 md:px-12 py-24">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9 }}
+          viewport={{ once: true }}
+          className="grid md:grid-cols-2 gap-16 items-center"
         >
-          Order NOW
-        </Link>
-      </motion.div>
+          <div>
+            <h2 className="text-3xl font-serif text-[#F4EAD0] mb-6">
+              Filosofi “Lamak Bana”
+            </h2>
+            <p className="text-gray-300 leading-relaxed mb-4">
+              Dalam bahasa Minang, <span className="italic">Lamak Bana</span> berarti teramat lezat.
+              Filosofi ini menjadi dasar setiap hidangan yang kami sajikan —
+              dari pemilihan bahan terbaik hingga proses memasak yang penuh ketelatenan.
+            </p>
+            <p className="text-gray-400 leading-relaxed">
+              Didirikan oleh perantau Minang di Jepang, restoran ini menjadi jembatan budaya —
+              mempertemukan cita rasa Nusantara dengan kehalusan estetika Jepang.
+              Kami percaya makanan bukan sekadar rasa, melainkan pengalaman dan cerita.
+            </p>
+          </div>
+
+          <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
+            <Image
+              src={chefImg}
+              alt="Interior restoran"
+              fill
+              className="object-cover"
+            />
+          </div>
+        </motion.div>
+      </div>
+
+      {/* ================= HIGHLIGHT ================= */}
+      <div className="bg-[#111] py-20">
+        <div className="max-w-6xl mx-auto px-6 md:px-12 grid md:grid-cols-3 gap-8 text-center">
+          {[
+            {
+              title: "🇯🇵 Berdiri di Jepang",
+              desc: "Didirikan tahun 2024 di Kagawa, mengusung semangat perantauan dan kecintaan pada kuliner Nusantara.",
+            },
+            {
+              title: "Rasa Autentik Minang",
+              desc: "Resep asli Minangkabau dengan teknik memasak tradisional yang diwariskan turun-temurun.",
+            },
+            {
+              title: "Harmoni Budaya",
+              desc: "Menggabungkan kekayaan rasa Minang dengan estetika dan keramahan Jepang.",
+            },
+          ].map((card, i) => (
+            <motion.div
+              key={i}
+              whileHover={{ y: -5 }}
+              className="bg-black p-8 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300"
+            >
+              <h3 className="text-[#F4EAD0] text-xl font-semibold mb-3">
+                {card.title}
+              </h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                {card.desc}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* ================= CTA ================= */}
+      <div className="py-24 text-center px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          viewport={{ once: true }}
+        >
+          <h2 className="text-3xl font-serif text-[#F4EAD0] mb-6">
+            Siap merasakan kelezatan sejati?
+          </h2>
+
+          <Link
+            href="/order"
+            className="inline-block bg-[#F4EAD0] text-black px-10 py-3 rounded-lg text-lg font-medium hover:bg-white transition duration-300"
+          >
+            Order Sekarang
+          </Link>
+        </motion.div>
+      </div>
     </section>
   );
 }

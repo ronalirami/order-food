@@ -26,7 +26,7 @@ export default function HomePage() {
       </div>
 
       {/* RIGHT GRID */}
-      <div className="w-1/4 grid grid-rows-3 gap-2">
+      <div className="w-1/4 grid grid-rows-3 gap-">
         <HeroCard image={heroSide1} link="/menu" label="Menu" />
         <HeroCard image={heroSide2} link="/order" label="Reservasi" />
         <HeroCard image={heroSide3} link="/tentang" label="Tentang" />
