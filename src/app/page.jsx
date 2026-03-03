@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import heroMain from "@/assets/images/hero-main.png";
-import heroSide1 from "@/assets/images/hero-side-1.jpg";
-import heroSide2 from "@/assets/images/hero-side-2.jpg";
-import heroSide3 from "@/assets/images/hero-side-3.jpg";
+import heroSide1 from "@/assets/images/hero-side1.jpg";
+import heroSide2 from "@/assets/images/hero-side2.jpg";
+import heroSide3 from "@/assets/images/hero-side3.jpg";
 export default function HomePage() {
   return (
     <section className="w-full h-screen flex overflow-hidden ">
