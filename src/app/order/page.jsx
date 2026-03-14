@@ -1,103 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { menuItems } from "@/data/menuData";
+import { useCart } from "@/context/CartContext";
 
 export default function OrderPage() {
-  const [cart, setCart] = useState([]);
+  const { cart, addToCart, increaseQty, decreaseQty, removeFromCart, totalHarga } = useCart();
 
-  // =========================
-  // DATA MENU
-  // =========================
-  const menuItems = [
-    {
-      id: 1,
-      nama: "Rendang Daging Sapi",
-      deskripsi:
-        "Dimasak perlahan dengan bumbu rempah khas Minang hingga daging empuk dan beraroma harum.",
-      harga: 1200,
-      gambar: "/images/heroside1.jpg",
-    },
-    {
-      id: 2,
-      nama: "Ayam Pop",
-      deskripsi:
-        "Ayam khas Padang yang lembut disajikan dengan sambal merah pedas gurih.",
-      harga: 1000,
-      gambar: "/images/ayam-pop.jpg",
-    },
-    {
-      id: 3,
-      nama: "Gulai Tunjang",
-      deskripsi:
-        "Tulang sapi dengan daging lembut disajikan bersama kuah santan kental.",
-      harga: 1300,
-      gambar: "/images/gulai-tunjang.jpg",
-    },
-  ];
-
-  // =========================
-  // FORMAT YEN (ANTI HYDRATION ERROR)
-  // =========================
-  const formatYen = (number) =>
-    new Intl.NumberFormat("ja-JP").format(number);
-
-  // =========================
-  // TAMBAH KE CART
-  // =========================
-  const addToCart = (item) => {
-    setCart((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
-
-      if (existing) {
-        return prev.map((i) =>
-          i.id === item.id ? { ...i, qty: i.qty + 1 } : i
-        );
-      } else {
-        return [...prev, { ...item, qty: 1 }];
-      }
-    });
-  };
-
-  // =========================
-  // TAMBAH QTY
-  // =========================
-  const increaseQty = (id) => {
-    setCart((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, qty: item.qty + 1 } : item
-      )
-    );
-  };
-
-  // =========================
-  // KURANGI QTY
-  // =========================
-  const decreaseQty = (id) => {
-    setCart((prev) =>
-      prev
-        .map((item) =>
-          item.id === id ? { ...item, qty: item.qty - 1 } : item
-        )
-        .filter((item) => item.qty > 0)
-    );
-  };
-
-  // =========================
-  // HAPUS ITEM
-  // =========================
-  const removeFromCart = (id) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  // =========================
-  // TOTAL
-  // =========================
-  const totalHarga = cart.reduce(
-    (sum, item) => sum + item.harga * item.qty,
-    0
-  );
+  const formatYen = (number) => new Intl.NumberFormat("ja-JP").format(number);
 
   return (
     <section className="min-h-screen bg-black text-white px-6 md:px-20 py-16">

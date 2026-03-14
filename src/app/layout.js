@@ -1,6 +1,7 @@
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Providers from "@/components/Providers";
 import { Lora, Poppins } from "next/font/google";
 
 // Import dua font
@@ -25,9 +26,11 @@ export default function RootLayout({ children }) {
       {/* Poppins untuk seluruh body */}
       <body className={`${poppins.className} min-h-screen flex flex-col bg-black text-white`}>
         {/* Kirim font Lora ke Navbar untuk logo */}
-        <Navbar fontTitle={lora.className} />
-        <main className="flex-1">{children}</main>
-        {/* <Footer /> */}
+        <Providers>
+          <Navbar fontTitle={lora.className} />
+          <main className="flex-1">{children}</main>
+          {/* <Footer /> */}
+        </Providers>
       </body>
     </html>
   );
