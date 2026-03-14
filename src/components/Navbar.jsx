@@ -59,9 +59,10 @@ export default function Navbar({ fontTitle }) {
         {/* Hamburger mobile */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="sm:hidden p-2 bg-white/10 rounded-md hover:bg-white/20 transition"
+          className="sm:hidden flex flex-col items-center gap-0.5 p-2 bg-white/10 rounded-md hover:bg-white/20 transition"
         >
           {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          <span className="text-[10px] text-gray-300 leading-none">Menu</span>
         </button>
       </nav>
 
