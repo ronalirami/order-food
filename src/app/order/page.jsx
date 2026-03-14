@@ -28,7 +28,7 @@ export default function OrderPage() {
   };
 
   return (
-    <section className="min-h-screen bg-black text-white px-6 md:px-20 py-16">
+    <section className="min-h-screen bg-black text-white px-6 md:px-20" style={{ paddingTop: "8rem", paddingBottom: "4rem" }}>
       {/* JUDUL */}
       <motion.div
         initial={{ opacity: 0, y: -40 }}
