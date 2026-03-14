@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react"; // ✅ ikon hamburger dan close
+import { Menu, X, ShoppingCart } from "lucide-react";
+import { useCart } from "@/context/CartContext";
 
 export default function Navbar({ fontTitle }) {
-  const [isOpen, setIsOpen] = useState(false); // ✅ kontrol buka/tutup menu
+  const [isOpen, setIsOpen] = useState(false);
+  const { totalItem } = useCart();
 
   return (
     <header className="fixed top-6 left-4 z-50 w-xs px-6">
@@ -23,21 +25,7 @@ export default function Navbar({ fontTitle }) {
             onClick={() => setIsOpen(!isOpen)}
             className="sm:hidden p-2 bg-white/10 rounded-md hover:bg-white/20 transition"
           >
-            {/* Ikon hamburger */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-5 h-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
+            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
           {/* Logo */}
@@ -55,8 +43,14 @@ export default function Navbar({ fontTitle }) {
           <Link href="/tentang" className="hover:text-[#F4EAD0] transition">
             Tentang
           </Link>
-          <Link href="/order" className="hover:text-[#F4EAD0] transition text-amber-500">
+          <Link href="/order" className="relative hover:text-[#F4EAD0] transition text-amber-500 flex items-center gap-1">
+            <ShoppingCart className="w-4 h-4" />
             Order
+            {totalItem > 0 && (
+              <span className="absolute -top-3 -right-3 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center leading-none">
+                {totalItem}
+              </span>
+            )}
           </Link>
         </div>
       </nav>
@@ -70,8 +64,14 @@ export default function Navbar({ fontTitle }) {
           <Link href="/tentang" className="hover:text-[#F4EAD0] transition">
             Tentang
           </Link>
-          <Link href="/order" className="hover:text-[#F4EAD0] transition">
+          <Link href="/order" className="relative hover:text-[#F4EAD0] transition flex items-center gap-1">
+            <ShoppingCart className="w-4 h-4" />
             Order
+            {totalItem > 0 && (
+              <span className="absolute -top-3 -right-3 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center leading-none">
+                {totalItem}
+              </span>
+            )}
           </Link>
         </div>
       )}
