@@ -27,7 +27,8 @@ export default function MenuPage() {
           initial={{ opacity: 0, y: -40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="text-center mb-16"
+          className="text-center"
+          style={{ marginBottom: "5rem" }}
         >
           <h1 className="title">Daftar Menu</h1>
           <p className="subtitle">
@@ -44,8 +45,9 @@ export default function MenuPage() {
             transition={{ duration: 0.6, delay: groupIdx * 0.1 }}
             viewport={{ once: true }}
             className="mb-16"
+            style={{ marginBottom: "6rem" }}
           >
-            <h2 className="text-2xl font-serif text-[#F4EAD0] border-b border-gray-800 pb-3 mb-8">
+            <h2 className="text-2xl font-serif text-[#F4EAD0] border-b border-gray-800 pb-3 mb-10 text-center">
               {group.label}
             </h2>
 
