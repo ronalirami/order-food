@@ -1,7 +1,12 @@
 "use client";
 
 import { CartProvider } from "@/context/CartContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 export default function Providers({ children }) {
-  return <CartProvider>{children}</CartProvider>;
+  return (
+    <LanguageProvider>
+      <CartProvider>{children}</CartProvider>
+    </LanguageProvider>
+  );
 }

@@ -1,11 +1,16 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import heroMain from "@/assets/images/hero-main.png";
 import heroSide1 from "@/assets/images/hero-side1.jpg";
 import heroSide2 from "@/assets/images/hero-side2.jpg";
 import heroSide3 from "@/assets/images/hero-side3.jpg";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function HomePage() {
+  const { t } = useLanguage();
+
   return (
     <section className="w-full h-screen flex flex-row gap-2 overflow-hidden p-2">
 
@@ -20,16 +25,16 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 flex items-end px-6 md:px-16 pb-8 md:pb-16 z-10">
           <h1 className="text-3xl md:text-6xl font-serif text-[#F4EAD0] drop-shadow-lg">
-            NasiPadang <br /> MARANTAU
+            {t("home.title")} <br /> {t("home.subtitle")}
           </h1>
         </div>
       </div>
 
       {/* GRID 3 KARTU */}
       <div className="flex flex-col gap-2 w-1/3 md:w-1/4">
-        <HeroCard image={heroSide1} link="/menu" label="Menu" />
-        <HeroCard image={heroSide2} link="/order" label="Order" />
-        <HeroCard image={heroSide3} link="/tentang" label="Tentang" />
+        <HeroCard image={heroSide1} link="/menu" label={t("home.cardMenu")} />
+        <HeroCard image={heroSide2} link="/order" label={t("home.cardOrder")} />
+        <HeroCard image={heroSide3} link="/tentang" label={t("home.cardTentang")} />
       </div>
 
     </section>

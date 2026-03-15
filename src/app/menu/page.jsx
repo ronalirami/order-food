@@ -2,11 +2,13 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Container from "@/components/Container";
-import { menuItems, kategoriLabel } from "@/data/menuData";
+import { menuItems } from "@/data/menuData";
 import { useCart } from "@/context/CartContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function MenuPage() {
   const { addToCart, cart } = useCart();
+  const { t } = useLanguage();
   const formatYen = (number) => new Intl.NumberFormat("ja-JP").format(number);
 
   const getQtyInCart = (id) => {
@@ -14,9 +16,9 @@ export default function MenuPage() {
     return item ? item.qty : 0;
   };
 
-  const groupedMenu = Object.keys(kategoriLabel).map((kat) => ({
+  const groupedMenu = ["makanan", "minuman", "cemilan"].map((kat) => ({
     kategori: kat,
-    label: kategoriLabel[kat],
+    label: t(`menu.kategori.${kat}`),
     items: menuItems.filter((item) => item.kategori === kat),
   }));
 
@@ -30,11 +32,8 @@ export default function MenuPage() {
           className="text-center"
           style={{ marginBottom: "5rem" }}
         >
-          <h1 className="title">Daftar Menu</h1>
-          <p className="subtitle">
-            Pilihan hidangan terbaik dari dapur Minangkabau kami — autentik,
-            lembut, dan penuh cita rasa.
-          </p>
+          <h1 className="title">{t("menu.title")}</h1>
+          <p className="subtitle">{t("menu.subtitle")}</p>
         </motion.div>
 
         {groupedMenu.map((group, groupIdx) => (
@@ -44,7 +43,6 @@ export default function MenuPage() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: groupIdx * 0.1 }}
             viewport={{ once: true }}
-            className="mb-16"
             style={{ marginBottom: "6rem" }}
           >
             <h2 className="text-2xl font-serif text-[#F4EAD0] border-b border-gray-800 pb-3 mb-10 text-center">
@@ -90,7 +88,7 @@ export default function MenuPage() {
                         onClick={() => addToCart(item)}
                         className="relative bg-[#F4EAD0] text-black px-3 py-1 rounded-full text-xs font-semibold hover:bg-white transition"
                       >
-                        + Tambah
+                        {t("menu.tambah")}
                         {getQtyInCart(item.id) > 0 && (
                           <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center leading-none">
                             {getQtyInCart(item.id)}

@@ -5,8 +5,11 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import chefImg from "@/assets/images/hero-side2.jpg";
 import filosofiImg from "@/assets/images/hero-side3.jpg";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function TentangPage() {
+  const { t } = useLanguage();
+
   return (
     <section className="bg-black text-white">
 
@@ -26,10 +29,10 @@ export default function TentangPage() {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-5xl md:text-6xl font-serif text-[#F4EAD0] mb-4 tracking-wide">
-              Tentang Kami
+              {t("tentang.heroTitle")}
             </h1>
             <p className="text-gray-300 max-w-2xl mx-auto">
-              Membawa kehangatan Minangkabau ke Jepang dengan sentuhan elegan dan modern.
+              {t("tentang.heroSubtitle")}
             </p>
           </motion.div>
         </div>
@@ -47,17 +50,13 @@ export default function TentangPage() {
           {/* Teks */}
           <div>
             <h2 className="text-2xl md:text-3xl font-serif text-[#F4EAD0] mb-6">
-              Filosofi "Lamak Bana"
+              {t("tentang.filosofiTitle")}
             </h2>
             <p className="text-gray-300 leading-relaxed mb-4">
-              Dalam bahasa Minang, <span className="italic">Lamak Bana</span> berarti teramat lezat.
-              Filosofi ini menjadi dasar setiap hidangan yang kami sajikan —
-              dari pemilihan bahan terbaik hingga proses memasak yang penuh ketelatenan.
+              {t("tentang.filosofiP1")}
             </p>
             <p className="text-gray-400 leading-relaxed">
-              Didirikan oleh perantau Minang di Jepang, restoran ini menjadi jembatan budaya —
-              mempertemukan cita rasa Nusantara dengan kehalusan estetika Jepang.
-              Kami percaya makanan bukan sekadar rasa, melainkan pengalaman dan cerita.
+              {t("tentang.filosofiP2")}
             </p>
           </div>
 
@@ -80,18 +79,9 @@ export default function TentangPage() {
       <div className="bg-[#111] py-16 md:py-20">
         <div className="max-w-6xl mx-auto px-6 md:px-12 grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-8 text-center">
           {[
-            {
-              title: "🇯🇵 Berdiri di Jepang",
-              desc: "Didirikan tahun 2024 di Kagawa, mengusung semangat perantauan dan kecintaan pada kuliner Nusantara.",
-            },
-            {
-              title: "🍛 Rasa Autentik Minang",
-              desc: "Resep asli Minangkabau dengan teknik memasak tradisional yang diwariskan turun-temurun.",
-            },
-            {
-              title: "🤝 Harmoni Budaya",
-              desc: "Menggabungkan kekayaan rasa Minang dengan estetika dan keramahan Jepang.",
-            },
+            { title: t("tentang.h1"), desc: t("tentang.h1desc") },
+            { title: t("tentang.h2"), desc: t("tentang.h2desc") },
+            { title: t("tentang.h3"), desc: t("tentang.h3desc") },
           ].map((card, i) => (
             <motion.div
               key={i}
@@ -120,13 +110,13 @@ export default function TentangPage() {
           viewport={{ once: true }}
         >
           <h2 className="text-3xl font-serif text-[#F4EAD0] mb-6">
-            Siap merasakan kelezatan sejati?
+            {t("tentang.ctaTitle")}
           </h2>
           <Link
             href="/order"
             className="inline-block bg-[#F4EAD0] text-black px-10 py-3 rounded-lg text-lg font-medium hover:bg-white transition duration-300"
           >
-            Order Sekarang
+            {t("tentang.ctaBtn")}
           </Link>
         </motion.div>
       </div>

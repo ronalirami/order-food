@@ -4,11 +4,19 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { totalItem } = useCart();
+  const { lang, setLang, t } = useLanguage();
+
+  const languages = [
+    { code: "id", flag: "🇮🇩" },
+    { code: "en", flag: "🇬🇧" },
+    { code: "ja", flag: "🇯🇵" },
+  ];
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -37,28 +45,44 @@ export default function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-light">
-          <Link href="/menu" className="hover:text-[#F4EAD0] transition">
-            Menu
-          </Link>
-          <Link href="/tentang" className="hover:text-[#F4EAD0] transition">
-            Tentang
-          </Link>
-          <Link
-            href="/order"
-            className="relative flex items-center gap-1 text-amber-500 hover:text-amber-300 transition"
-          >
-            <ShoppingCart className="w-4 h-4" />
-            Order
-            {totalItem > 0 && (
-              <span
-                className="absolute bg-red-500 text-white rounded-full flex items-center justify-center text-white font-bold"
-                style={{ fontSize: "9px", width: "16px", height: "16px", top: "-10px", right: "-12px" }}
-              >
-                {totalItem}
-              </span>
-            )}
-          </Link>
+            <Link href="/menu" className="hover:text-[#F4EAD0] transition">
+              {t("nav.menu")}
+            </Link>
+            <Link href="/tentang" className="hover:text-[#F4EAD0] transition">
+              {t("nav.tentang")}
+            </Link>
+            <Link
+              href="/order"
+              className="relative flex items-center gap-1 text-amber-500 hover:text-amber-300 transition"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              {t("nav.order")}
+              {totalItem > 0 && (
+                <span
+                  className="absolute bg-red-500 text-white rounded-full flex items-center justify-center font-bold"
+                  style={{ fontSize: "9px", width: "16px", height: "16px", top: "-10px", right: "-12px" }}
+                >
+                  {totalItem}
+                </span>
+              )}
+            </Link>
+
           </div>
+        </div>
+
+        {/* LANGUAGE SWITCHER DESKTOP */}
+        <div className="hidden md:flex items-center gap-2">
+          {languages.map(({ code, flag }) => (
+            <button
+              key={code}
+              onClick={() => setLang(code)}
+              title={code.toUpperCase()}
+              className="text-base transition-all"
+              style={{ opacity: lang === code ? 1 : 0.35, transform: lang === code ? "scale(1.2)" : "scale(1)" }}
+            >
+              {flag}
+            </button>
+          ))}
         </div>
 
         {/* HAMBURGER MOBILE */}
@@ -88,23 +112,22 @@ export default function Navbar() {
             onClick={() => setIsOpen(false)}
             className="py-3 border-b border-gray-800 hover:text-[#F4EAD0] transition"
           >
-            Menu
+            {t("nav.menu")}
           </Link>
           <Link
             href="/tentang"
             onClick={() => setIsOpen(false)}
             className="py-3 border-b border-gray-800 hover:text-[#F4EAD0] transition"
           >
-            Tentang
+            {t("nav.tentang")}
           </Link>
           <Link
             href="/order"
             onClick={() => setIsOpen(false)}
-            className="py-3 flex items-center gap-2 text-amber-500 hover:text-amber-300 transition"
-            style={{ position: "relative" }}
+            className="py-3 border-b border-gray-800 flex items-center gap-2 text-amber-500 hover:text-amber-300 transition"
           >
             <ShoppingCart className="w-4 h-4" />
-            Order
+            {t("nav.order")}
             {totalItem > 0 && (
               <span
                 className="bg-red-500 text-white rounded-full flex items-center justify-center font-bold"
@@ -114,6 +137,20 @@ export default function Navbar() {
               </span>
             )}
           </Link>
+
+          {/* Language Switcher Mobile */}
+          <div className="py-3 flex items-center gap-3">
+            {languages.map(({ code, flag }) => (
+              <button
+                key={code}
+                onClick={() => { setLang(code); setIsOpen(false); }}
+                className="text-lg transition-all"
+                style={{ opacity: lang === code ? 1 : 0.35, transform: lang === code ? "scale(1.2)" : "scale(1)" }}
+              >
+                {flag}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </header>

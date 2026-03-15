@@ -5,9 +5,11 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { menuItems } from "@/data/menuData";
 import { useCart } from "@/context/CartContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function OrderPage() {
   const { cart, addToCart, increaseQty, decreaseQty, removeFromCart, totalHarga, clearCart } = useCart();
+  const { t } = useLanguage();
   const [showModal, setShowModal] = useState(false);
   const [namaPemesan, setNamaPemesan] = useState("");
   const [nomorMeja, setNomorMeja] = useState("");
@@ -37,10 +39,10 @@ export default function OrderPage() {
         className="text-center mb-12"
       >
         <h1 className="text-5xl font-serif text-[#F4EAD0] mb-3">
-          Order Sekarang
+          {t("order.title")}
         </h1>
         <p className="text-gray-400">
-          Pilih menu favorit Anda dan pesan langsung dari meja.
+          {t("order.subtitle")}
         </p>
       </motion.div>
 
@@ -79,7 +81,7 @@ export default function OrderPage() {
                 onClick={() => addToCart(item)}
                 className="bg-[#F4EAD0] text-black px-4 py-2 rounded-lg hover:bg-white transition self-center"
               >
-                Pesan
+                {t("order.pesan")}
               </button>
             </motion.div>
           ))}
@@ -88,11 +90,11 @@ export default function OrderPage() {
         {/* KERANJANG */}
         <div className="w-full md:w-1/3 bg-[#111] p-6 rounded-2xl h-fit sticky top-16 shadow-lg">
           <h2 className="text-2xl font-serif text-[#F4EAD0] mb-4">
-            Keranjang
+            {t("order.keranjang")}
           </h2>
 
           {cart.length === 0 ? (
-            <p className="text-gray-400">Belum ada pesanan.</p>
+            <p className="text-gray-400">{t("order.belumAda")}</p>
           ) : (
             <div className="space-y-5">
               {cart.map((item) => (
@@ -132,7 +134,7 @@ export default function OrderPage() {
 
               {/* TOTAL */}
               <div className="border-t border-gray-700 pt-4 flex justify-between">
-                <span className="text-gray-400">Total</span>
+                <span className="text-gray-400">{t("order.total")}</span>
                 <span className="text-[#F4EAD0] font-semibold">
                   ¥{formatYen(totalHarga)}
                 </span>
@@ -145,7 +147,7 @@ export default function OrderPage() {
                 onClick={() => setShowModal(true)}
                 className="w-full bg-[#F4EAD0] text-black py-3 rounded-lg mt-4 font-medium hover:bg-white transition"
               >
-                Konfirmasi Pesanan
+                {t("order.konfirmasi")}
               </motion.button>
             </div>
           )}
@@ -177,18 +179,18 @@ export default function OrderPage() {
                 >
                   <div className="text-5xl mb-4">✅</div>
                   <h3 className="text-2xl font-serif text-[#F4EAD0] mb-2">
-                    Pesanan Diterima!
+                    {t("order.sukses")}
                   </h3>
                   <p className="text-gray-400 text-sm">
-                    Terima kasih, <span className="text-white">{namaPemesan}</span>.
-                    Pesanan meja <span className="text-white">#{nomorMeja}</span> sedang diproses.
+                    {t("order.suksesMsg")} <span className="text-white">{namaPemesan}</span>.{" "}
+                    {t("order.suksesMsg2")} <span className="text-white">#{nomorMeja}</span> {t("order.suksesMsg3")}
                   </p>
                 </motion.div>
               ) : (
                 <>
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="text-xl font-serif text-[#F4EAD0]">
-                      Konfirmasi Pesanan
+                      {t("order.modalTitle")}
                     </h3>
                     <button
                       onClick={() => setShowModal(false)}
@@ -213,7 +215,7 @@ export default function OrderPage() {
                   </div>
 
                   <div className="border-t border-gray-700 pt-3 flex justify-between mb-6">
-                    <span className="text-gray-400 text-sm">Total</span>
+                    <span className="text-gray-400 text-sm">{t("order.total")}</span>
                     <span className="text-[#F4EAD0] font-semibold">
                       ¥{formatYen(totalHarga)}
                     </span>
@@ -223,14 +225,14 @@ export default function OrderPage() {
                   <div className="space-y-3 mb-6">
                     <input
                       type="text"
-                      placeholder="Nama pemesan"
+                      placeholder={t("order.namaPemesan")}
                       value={namaPemesan}
                       onChange={(e) => setNamaPemesan(e.target.value)}
                       className="w-full bg-black border border-gray-700 rounded-lg px-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#F4EAD0] transition"
                     />
                     <input
                       type="text"
-                      placeholder="Nomor meja"
+                      placeholder={t("order.nomorMeja")}
                       value={nomorMeja}
                       onChange={(e) => setNomorMeja(e.target.value)}
                       className="w-full bg-black border border-gray-700 rounded-lg px-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#F4EAD0] transition"
@@ -244,7 +246,7 @@ export default function OrderPage() {
                     disabled={!namaPemesan.trim() || !nomorMeja.trim()}
                     className="w-full bg-[#F4EAD0] text-black py-3 rounded-lg font-medium hover:bg-white transition disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    Konfirmasi & Kirim Pesanan
+                    {t("order.konfirmasiKirim")}
                   </motion.button>
                 </>
               )}
