@@ -4,12 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import chefImg from "@/assets/images/hero-side2.jpg";
+import filosofiImg from "@/assets/images/hero-side3.jpg";
 
 export default function TentangPage() {
   return (
     <section className="bg-black text-white">
-      
-      {/* ================= HERO SECTION ================= */}
+
+      {/* HERO SECTION */}
       <div className="relative h-[60vh] w-full overflow-hidden">
         <Image
           src={chefImg}
@@ -18,7 +19,6 @@ export default function TentangPage() {
           priority
           className="object-cover brightness-50"
         />
-
         <div className="absolute inset-0 flex items-center justify-center text-center px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -35,18 +35,19 @@ export default function TentangPage() {
         </div>
       </div>
 
-      {/* ================= FILOSOFI SECTION ================= */}
-      <div className="max-w-6xl mx-auto px-6 md:px-12 py-24">
+      {/* FILOSOFI SECTION */}
+      <div className="max-w-6xl mx-auto px-6 md:px-12 py-16 md:py-24">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9 }}
           viewport={{ once: true }}
-          className="grid md:grid-cols-2 gap-16 items-center"
+          className="grid md:grid-cols-2 gap-10 md:gap-16 items-center"
         >
+          {/* Teks */}
           <div>
-            <h2 className="text-3xl font-serif text-[#F4EAD0] mb-6">
-              Filosofi “Lamak Bana”
+            <h2 className="text-2xl md:text-3xl font-serif text-[#F4EAD0] mb-6">
+              Filosofi "Lamak Bana"
             </h2>
             <p className="text-gray-300 leading-relaxed mb-4">
               Dalam bahasa Minang, <span className="italic">Lamak Bana</span> berarti teramat lezat.
@@ -60,10 +61,14 @@ export default function TentangPage() {
             </p>
           </div>
 
-          <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
+          {/* Gambar berbeda dari hero */}
+          <div
+            className="relative rounded-2xl overflow-hidden shadow-xl"
+            style={{ height: "280px" }}
+          >
             <Image
-              src={chefImg}
-              alt="Interior restoran"
+              src={filosofiImg}
+              alt="Suasana restoran Lamak Bana"
               fill
               className="object-cover"
             />
@@ -71,32 +76,34 @@ export default function TentangPage() {
         </motion.div>
       </div>
 
-      {/* ================= HIGHLIGHT ================= */}
-      <div className="bg-[#111] py-20">
-        <div className="max-w-6xl mx-auto px-6 md:px-12 grid md:grid-cols-3 gap-8 text-center">
+      {/* HIGHLIGHT CARDS */}
+      <div className="bg-[#111] py-16 md:py-20">
+        <div className="max-w-6xl mx-auto px-6 md:px-12 grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-8 text-center">
           {[
             {
               title: "🇯🇵 Berdiri di Jepang",
               desc: "Didirikan tahun 2024 di Kagawa, mengusung semangat perantauan dan kecintaan pada kuliner Nusantara.",
             },
             {
-              title: "Rasa Autentik Minang",
+              title: "🍛 Rasa Autentik Minang",
               desc: "Resep asli Minangkabau dengan teknik memasak tradisional yang diwariskan turun-temurun.",
             },
             {
-              title: "Harmoni Budaya",
+              title: "🤝 Harmoni Budaya",
               desc: "Menggabungkan kekayaan rasa Minang dengan estetika dan keramahan Jepang.",
             },
           ].map((card, i) => (
             <motion.div
               key={i}
               whileHover={{ y: -5 }}
-              className="bg-black p-8 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300"
+              className={`bg-black p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 ${
+                i === 2 ? "col-span-2 md:col-span-1" : ""
+              }`}
             >
-              <h3 className="text-[#F4EAD0] text-xl font-semibold mb-3">
+              <h3 className="text-[#F4EAD0] text-base md:text-xl font-semibold mb-3">
                 {card.title}
               </h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p className="text-gray-400 text-xs md:text-sm leading-relaxed">
                 {card.desc}
               </p>
             </motion.div>
@@ -104,7 +111,7 @@ export default function TentangPage() {
         </div>
       </div>
 
-      {/* ================= CTA ================= */}
+      {/* CTA */}
       <div className="text-center px-6" style={{ paddingTop: "6rem", paddingBottom: "10rem" }}>
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -115,7 +122,6 @@ export default function TentangPage() {
           <h2 className="text-3xl font-serif text-[#F4EAD0] mb-6">
             Siap merasakan kelezatan sejati?
           </h2>
-
           <Link
             href="/order"
             className="inline-block bg-[#F4EAD0] text-black px-10 py-3 rounded-lg text-lg font-medium hover:bg-white transition duration-300"
@@ -124,6 +130,7 @@ export default function TentangPage() {
           </Link>
         </motion.div>
       </div>
+
     </section>
   );
 }
