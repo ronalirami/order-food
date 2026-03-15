@@ -10,8 +10,8 @@ export const translations = {
       order: "Order",
     },
     home: {
-      title: "Lamak Bana",
-      subtitle: "Restoran Padang",
+      title: "NasiPadang",
+      subtitle: "MARANTAU",
       cardMenu: "Menu",
       cardOrder: "Order",
       cardTentang: "Tentang",
@@ -80,8 +80,8 @@ export const translations = {
       order: "Order",
     },
     home: {
-      title: "Lamak Bana",
-      subtitle: "Padang Restaurant",
+      title: "NasiPadang",
+      subtitle: "MARANTAU",
       cardMenu: "Menu",
       cardOrder: "Order",
       cardTentang: "About",
@@ -150,8 +150,8 @@ export const translations = {
       order: "注文",
     },
     home: {
-      title: "ラマク・バナ",
-      subtitle: "パダン料理レストラン",
+      title: "NasiPadang",
+      subtitle: "MARANTAU",
       cardMenu: "メニュー",
       cardOrder: "注文",
       cardTentang: "私たちについて",
