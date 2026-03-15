@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Menu, X, ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 
-export default function Navbar({ fontTitle }) {
+export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { totalItem } = useCart();
@@ -19,22 +19,24 @@ export default function Navbar({ fontTitle }) {
   return (
     <header
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-black/95 backdrop-blur-md shadow-lg"
-          : "bg-transparent"
+        scrolled ? "bg-black/95 backdrop-blur-md shadow-lg" : "bg-transparent"
       }`}
     >
+      {/* NAV UTAMA */}
       <nav className="max-w-screen-xl mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
 
-        {/* Logo + Menu desktop */}
+        {/* LOGO + MENU DESKTOP */}
         <div className="flex items-center gap-8">
           <Link href="/">
-            <h1 className="font-serif tracking-widest text-[#F4EAD0] text-base sm:text-lg font-semibold">
+            <h1
+              className="font-serif tracking-widest font-semibold text-purple-300 px-3 py-1 rounded-md"
+              style={{ border: "1px solid #d8b4fe", fontSize: "1rem" }}
+            >
               RM. LamakBana
             </h1>
           </Link>
 
-          <div className="hidden sm:flex items-center gap-8 text-sm font-light">
+          <div className="hidden md:flex items-center gap-8 text-sm font-light">
           <Link href="/menu" className="hover:text-[#F4EAD0] transition">
             Menu
           </Link>
@@ -43,12 +45,15 @@ export default function Navbar({ fontTitle }) {
           </Link>
           <Link
             href="/order"
-            className="relative hover:text-[#F4EAD0] transition text-amber-500 flex items-center gap-1"
+            className="relative flex items-center gap-1 text-amber-500 hover:text-amber-300 transition"
           >
             <ShoppingCart className="w-4 h-4" />
             Order
             {totalItem > 0 && (
-              <span className="absolute -top-3 -right-3 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center leading-none">
+              <span
+                className="absolute bg-red-500 text-white rounded-full flex items-center justify-center text-white font-bold"
+                style={{ fontSize: "9px", width: "16px", height: "16px", top: "-10px", right: "-12px" }}
+              >
                 {totalItem}
               </span>
             )}
@@ -56,42 +61,55 @@ export default function Navbar({ fontTitle }) {
           </div>
         </div>
 
-        {/* Hamburger mobile */}
+        {/* HAMBURGER MOBILE */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="sm:hidden flex flex-col items-center gap-0.5 p-2 bg-white/10 rounded-md hover:bg-white/20 transition"
+          className="md:hidden flex flex-col items-center rounded-md transition"
+          style={{ gap: "2px", padding: "8px", border: "1px solid rgba(255,255,255,0.3)" }}
         >
-          {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          <span className="text-[10px] text-gray-300 leading-none">Menu</span>
+          {isOpen
+            ? <X className="w-5 h-5 text-white" />
+            : <Menu className="w-5 h-5 text-white" />
+          }
+          <span className="text-white leading-none" style={{ fontSize: "9px" }}>
+            {isOpen ? "Tutup" : "Menu"}
+          </span>
         </button>
       </nav>
 
-      {/* Dropdown mobile */}
+      {/* DROPDOWN MOBILE */}
       {isOpen && (
-        <div className="sm:hidden bg-black/95 text-white px-6 pb-6 flex flex-col gap-4 text-sm">
+        <div
+          className="md:hidden flex flex-col text-sm"
+          style={{ background: "rgba(0,0,0,0.97)", padding: "0 1.5rem 1.5rem" }}
+        >
           <Link
             href="/menu"
             onClick={() => setIsOpen(false)}
-            className="hover:text-[#F4EAD0] transition"
+            className="py-3 border-b border-gray-800 hover:text-[#F4EAD0] transition"
           >
             Menu
           </Link>
           <Link
             href="/tentang"
             onClick={() => setIsOpen(false)}
-            className="hover:text-[#F4EAD0] transition"
+            className="py-3 border-b border-gray-800 hover:text-[#F4EAD0] transition"
           >
             Tentang
           </Link>
           <Link
             href="/order"
             onClick={() => setIsOpen(false)}
-            className="relative hover:text-[#F4EAD0] transition text-amber-500 flex items-center gap-1 w-fit"
+            className="py-3 flex items-center gap-2 text-amber-500 hover:text-amber-300 transition"
+            style={{ position: "relative" }}
           >
             <ShoppingCart className="w-4 h-4" />
             Order
             {totalItem > 0 && (
-              <span className="absolute -top-3 -right-3 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center leading-none">
+              <span
+                className="bg-red-500 text-white rounded-full flex items-center justify-center font-bold"
+                style={{ fontSize: "9px", width: "16px", height: "16px" }}
+              >
                 {totalItem}
               </span>
             )}

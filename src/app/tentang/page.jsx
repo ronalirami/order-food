@@ -105,7 +105,7 @@ export default function TentangPage() {
       </div>
 
       {/* ================= CTA ================= */}
-      <div className="py-24 text-center px-6">
+      <div className="text-center px-6" style={{ paddingTop: "6rem", paddingBottom: "10rem" }}>
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
