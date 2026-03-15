@@ -20,7 +20,7 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 flex items-end px-6 md:px-16 pb-8 md:pb-16 z-10">
           <h1 className="text-3xl md:text-6xl font-serif text-[#F4EAD0] drop-shadow-lg">
-            NasiPadang <br /> MARANTAU
+            Lamak Bana <br /> Restoran Padang
           </h1>
         </div>
       </div>

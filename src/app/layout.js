@@ -26,9 +26,8 @@ export default function RootLayout({ children }) {
     <html lang="id">
       {/* Poppins untuk seluruh body */}
       <body className={`${poppins.className} min-h-screen flex flex-col bg-black text-white`}>
-        {/* Kirim font Lora ke Navbar untuk logo */}
         <Providers>
-          <Navbar fontTitle={lora.className} />
+          <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />
         </Providers>
