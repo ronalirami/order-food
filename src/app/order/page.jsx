@@ -14,19 +14,51 @@ export default function OrderPage() {
   const [namaPemesan, setNamaPemesan] = useState("");
   const [nomorMeja, setNomorMeja] = useState("");
   const [pesananDikirim, setPesananDikirim] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const formatYen = (number) => new Intl.NumberFormat("ja-JP").format(number);
 
-  const handleKonfirmasi = () => {
+  const handleKonfirmasi = async () => {
     if (!namaPemesan.trim() || !nomorMeja.trim()) return;
-    setPesananDikirim(true);
-    setTimeout(() => {
-      clearCart();
-      setShowModal(false);
-      setPesananDikirim(false);
-      setNamaPemesan("");
-      setNomorMeja("");
-    }, 2500);
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nama_pemesan: namaPemesan.trim(),
+          nomor_meja: nomorMeja.trim(),
+          items: cart.map((item) => ({
+            nama: item.nama,
+            qty: item.qty,
+            harga: item.harga,
+          })),
+          total_harga: totalHarga,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Gagal mengirim pesanan");
+      }
+
+      setPesananDikirim(true);
+      setTimeout(() => {
+        clearCart();
+        setShowModal(false);
+        setPesananDikirim(false);
+        setNamaPemesan("");
+        setNomorMeja("");
+      }, 2500);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -239,14 +271,17 @@ export default function OrderPage() {
                     />
                   </div>
 
+                  {error && (
+                    <p className="text-red-400 text-sm mb-3">{error}</p>
+                  )}
                   <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
+                    whileHover={{ scale: isLoading ? 1 : 1.03 }}
+                    whileTap={{ scale: isLoading ? 1 : 0.97 }}
                     onClick={handleKonfirmasi}
-                    disabled={!namaPemesan.trim() || !nomorMeja.trim()}
+                    disabled={!namaPemesan.trim() || !nomorMeja.trim() || isLoading}
                     className="w-full bg-[#F4EAD0] text-black py-3 rounded-lg font-medium hover:bg-white transition disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    {t("order.konfirmasiKirim")}
+                    {isLoading ? t("order.mengirim") : t("order.konfirmasiKirim")}
                   </motion.button>
                 </>
               )}
