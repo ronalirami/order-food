@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase";
 
 export async function POST(request) {
-  if (!supabase) {
+  if (!supabaseAdmin) {
     return NextResponse.json(
-      { error: "Supabase belum dikonfigurasi. Buat file .env.local" },
+      { error: "Supabase belum dikonfigurasi. Tambah SUPABASE_SERVICE_ROLE_KEY di .env.local" },
       { status: 500 }
     );
   }
@@ -20,7 +20,7 @@ export async function POST(request) {
       );
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from("orders")
       .insert([
         {
