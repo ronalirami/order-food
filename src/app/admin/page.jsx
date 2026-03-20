@@ -1,22 +1,63 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
+
+async function fetchOrders() {
+  const { data, error } = await supabase
+    ?.from("orders")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
 
 export default function AdminPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const loadOrders = useCallback(async () => {
+    if (!supabase) {
+      setError("Supabase tidak dikonfigurasi");
+      setLoading(false);
+      return;
+    }
+    try {
+      const data = await fetchOrders();
+      setOrders(data);
+      setError("");
+    } catch (e) {
+      setError(e?.message || "Gagal memuat data");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    fetch("/api/orders")
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) setOrders(data);
-        else setError(data.error || "Gagal memuat data");
-      })
-      .catch(() => setError("Gagal memuat data"))
-      .finally(() => setLoading(false));
+    loadOrders();
+  }, [loadOrders]);
+
+  // Realtime: dengarkan pesanan baru
+  useEffect(() => {
+    if (!supabase) return;
+
+    const channel = supabase
+      .channel("orders-realtime")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "orders" },
+        () => {
+          // Ada pesanan baru, refresh daftar
+          fetchOrders().then(setOrders);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const formatYen = (n) => new Intl.NumberFormat("ja-JP").format(n);
