@@ -43,6 +43,15 @@ export const translations = {
       suksesMsg: "Terima kasih,",
       suksesMsg2: "Pesanan meja",
       suksesMsg3: "sedang diproses.",
+      bayarKasir: "Silakan lakukan pembayaran di kasir setelah pesanan siap.",
+      qrGateTitle: "Order hanya dari QR di meja",
+      qrGateBody:
+        "Buka tautan atau scan QR yang tersedia di meja Anda. Token berubah berkala; foto QR lama tidak lagi berlaku setelah pergantian token.",
+      qrGateMenuLink: "Lihat menu saja",
+      qrChecking: "Memverifikasi QR meja…",
+      qrInvalidTitle: "QR / token tidak valid",
+      qrInvalidBody: "QR mungkin sudah diganti atau kedaluwarsa. Minta QR terbaru ke staf atau scan ulang di meja.",
+      tableLocked: "Meja (dari QR)",
     },
     tentang: {
       heroTitle: "Tentang Kami",
@@ -114,6 +123,15 @@ export const translations = {
       suksesMsg: "Thank you,",
       suksesMsg2: "Order for table",
       suksesMsg3: "is being processed.",
+      bayarKasir: "Please pay at the counter when ready.",
+      qrGateTitle: "Order requires table QR code",
+      qrGateBody:
+        "Scan the QR on your table to open ordering. Tokens rotate periodically; saved photos stop working once the token is replaced.",
+      qrGateMenuLink: "Browse menu only",
+      qrChecking: "Verifying table QR…",
+      qrInvalidTitle: "Invalid or expired QR",
+      qrInvalidBody: "Ask staff for an updated QR or scan again at your table.",
+      tableLocked: "Table (from QR)",
     },
     tentang: {
       heroTitle: "About Us",
@@ -185,6 +203,15 @@ export const translations = {
       suksesMsg: "ありがとうございます、",
       suksesMsg2: "テーブル",
       suksesMsg3: "のご注文を処理中です。",
+      bayarKasir: "お支払いは注文準備後、レジにてお願いします。",
+      qrGateTitle: "ご注文はテーブルのQRから",
+      qrGateBody:
+        "テーブルに置いてあるQRを読み取ってください。トークンは定期的に更新されます。古い写真のQRは無効になります。",
+      qrGateMenuLink: "メニューのみ見る",
+      qrChecking: "QRを確認しています…",
+      qrInvalidTitle: "QR / トークンが無効です",
+      qrInvalidBody: "QRが更新されたか期限切れの可能性があります。スタッフに新しいQRを依頼するか、店内で読み取り直してください。",
+      tableLocked: "テーブル番号（QRから）",
     },
     tentang: {
       heroTitle: "私たちについて",

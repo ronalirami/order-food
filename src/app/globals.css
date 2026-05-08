@@ -44,3 +44,10 @@ html {
 .animate-fade-in-down {
   animation: fade-in-down 0.2s ease-out;
 }
+
+/* Tombol yang disembunyikan saat cetak QR */
+@media print {
+  .noprint {
+    display: none !important;
+  }
+}
