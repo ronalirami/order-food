@@ -54,7 +54,7 @@ Buka [http://localhost:3000](http://localhost:3000)
 | `/menu` | Daftar menu (makanan, minuman, cemilan) |
 | `/order` | Pemesanan + keranjang |
 | `/tentang` | Tentang restoran |
-| `/admin` | Daftar pesanan masuk (untuk pemilik) |
+| `/tukangsanduak` | Daftar pesanan staf (**URL `/admin` ditutup** di middleware) |
 
 ## Fitur
 

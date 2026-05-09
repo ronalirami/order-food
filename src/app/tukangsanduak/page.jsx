@@ -118,7 +118,7 @@ export default function AdminPage() {
           <h1 className="text-3xl font-serif text-[#F4EAD0]">Daftar Pesanan</h1>
           <div className="flex flex-wrap gap-3 text-sm">
             <Link
-              href="/admin/meja"
+              href="/tukangsanduak/meja"
               className="text-amber-400/90 hover:text-amber-300 transition border border-amber-500/30 px-3 py-1.5 rounded-lg"
             >
               QR & token meja

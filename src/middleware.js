@@ -1,11 +1,22 @@
 import { NextResponse } from "next/server";
 
+/** Path panel staf — bukan lagi `/admin`. */
+const STAFF_PANEL_PREFIX = "/tukangsanduak";
+
 /**
- * Opsi B — subdomain kasir: batasi /admin dan /api/admin hanya ke host yang Anda daftarkan.
- * Set KASIR_ALLOWED_HOSTS di Vercel Production, mis: kasir.restoranku.com
- * Kosongkan di local / preview jika belum punya subdomain (semua host boleh).
+ * Opsional — subdomain/host kasir: SET KASIR_ALLOWED_HOSTS untuk Production.
+ * Kosongkan = semua host boleh (pakai *.vercel.app gratis).
+ *
+ * Tambahan: akses langsung `/admin` ditutup permanen — pakai `/tukangsanduak`.
  */
 export function middleware(request) {
+  const pathname = request.nextUrl.pathname;
+
+  /* Path klasik diketahui banyak orang → kita balas 404 tanpa narasi panjang */
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
   const raw = process.env.KASIR_ALLOWED_HOSTS ?? "";
   const allowed = raw
     .split(",")
@@ -16,9 +27,19 @@ export function middleware(request) {
     return NextResponse.next();
   }
 
+  const applies =
+    pathname === STAFF_PANEL_PREFIX ||
+    pathname.startsWith(`${STAFF_PANEL_PREFIX}/`) ||
+    pathname.startsWith("/api/admin");
+
+  if (!applies) {
+    return NextResponse.next();
+  }
+
   const hostHeader = request.headers.get("host") ?? "";
   const host = hostHeader.split(":")[0]?.toLowerCase() ?? "";
-  if (!host || allowed.includes(host)) {
+
+  if (host && allowed.includes(host)) {
     return NextResponse.next();
   }
 
@@ -26,5 +47,11 @@ export function middleware(request) {
 }
 
 export const config = {
-  matcher: ["/admin", "/admin/:path*", "/api/admin/:path*"],
+  matcher: [
+    "/admin",
+    "/admin/:path*",
+    "/tukangsanduak",
+    "/tukangsanduak/:path*",
+    "/api/admin/:path*",
+  ],
 };
