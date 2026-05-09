@@ -2,18 +2,17 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
 import OrderUrlQr from "@/components/OrderUrlQr";
 
 const SESSION_KEY = "kasir_table_token_secret";
 
-async function fetchOrders() {
-  const { data, error } = await supabase
-    ?.from("orders")
-    .select("*")
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  return data ?? [];
+async function fetchOrdersFromApi(adminSecret) {
+  const res = await fetch("/api/admin/orders", {
+    headers: { "x-admin-secret": adminSecret.trim() },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || `Gagal (${res.status})`);
+  return Array.isArray(data) ? data : [];
 }
 
 export default function AdminPage() {
@@ -21,6 +20,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [kasirSecret, setKasirSecret] = useState("");
+  const [needsKasirSecret, setNeedsKasirSecret] = useState(false);
   const [actionKey, setActionKey] = useState(null);
   const [actionMsg, setActionMsg] = useState(null);
 
@@ -33,51 +33,45 @@ export default function AdminPage() {
     }
   }, []);
 
-  const simpanKodeSesi = () => {
-    try {
-      sessionStorage.setItem(SESSION_KEY, kasirSecret);
-      setActionMsg({ type: "ok", text: "Kode disimpan untuk sesi tab ini." });
-      setTimeout(() => setActionMsg(null), 3000);
-    } catch {
-      setActionMsg({ type: "err", text: "Tidak bisa simpan (browser)." });
-    }
-  };
-
   const loadOrders = useCallback(async () => {
-    if (!supabase) {
-      setError("Supabase tidak dikonfigurasi");
+    const secret =
+      kasirSecret.trim() ||
+      (typeof window !== "undefined" ? sessionStorage.getItem(SESSION_KEY) ?? "" : "");
+    if (!secret.trim()) {
+      setNeedsKasirSecret(true);
+      setOrders([]);
+      setError("");
       setLoading(false);
       return;
     }
+    setNeedsKasirSecret(false);
+    setLoading(true);
     try {
-      const data = await fetchOrders();
+      const data = await fetchOrdersFromApi(secret.trim());
       setOrders(data);
       setError("");
     } catch (e) {
+      setOrders([]);
       setError(e?.message || "Gagal memuat data");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [kasirSecret]);
 
   useEffect(() => {
     loadOrders();
   }, [loadOrders]);
 
-  useEffect(() => {
-    if (!supabase) return;
-
-    const channel = supabase
-      .channel("orders-realtime")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, () => {
-        fetchOrders().then(setOrders);
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+  const simpanKodeSesi = async () => {
+    try {
+      sessionStorage.setItem(SESSION_KEY, kasirSecret);
+      setActionMsg({ type: "ok", text: "Kode disimpan untuk sesi tab ini." });
+      setTimeout(() => setActionMsg(null), 3000);
+      await loadOrders();
+    } catch {
+      setActionMsg({ type: "err", text: "Tidak bisa simpan (browser)." });
+    }
+  };
 
   const selesaiMeja = async (nomorMeja, orderId) => {
     if (!kasirSecret.trim()) {
@@ -182,7 +176,16 @@ export default function AdminPage() {
         ) : error ? (
           <p className="text-red-400">{error}</p>
         ) : orders.length === 0 ? (
-          <p className="text-gray-400">Belum ada pesanan.</p>
+          needsKasirSecret ? (
+            <p className="text-gray-400">
+              Ketik kode yang sama dengan <code className="text-gray-500">TABLE_TOKEN_ROTATE_SECRET</code> di{" "}
+              <code className="text-gray-500">.env.local</code>, lalu ketuk{" "}
+              <strong className="text-[#F4EAD0]">Simpan di browser</strong> — tanpa itu daftar tidak dimuat dari
+              database.
+            </p>
+          ) : (
+            <p className="text-gray-400">Belum ada pesanan.</p>
+          )
         ) : (
           <div className="space-y-6">
             {orders.map((order) => (

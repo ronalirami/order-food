@@ -2,14 +2,24 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import {
+  ORDER_TABLE_TOKEN_STORAGE_KEY,
+  ORDER_TOKEN_CHANGED_EVENT,
+} from "@/lib/orderSessionToken";
 import { menuItems } from "@/data/menuData";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
 
+function notifyOrderTokenChanged() {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event(ORDER_TOKEN_CHANGED_EVENT));
+}
+
 export default function OrderPageClient() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const rawToken = searchParams.get("t")?.trim() ?? "";
 
@@ -34,17 +44,35 @@ export default function OrderPageClient() {
       const res = await fetch(`/api/order-token/verify?t=${encodeURIComponent(token)}`);
       const data = await res.json();
       if (!res.ok || !data.valid) {
+        try {
+          sessionStorage.removeItem(ORDER_TABLE_TOKEN_STORAGE_KEY);
+        } catch {
+          /* ignore */
+        }
+        notifyOrderTokenChanged();
         setGateOk(false);
         setMejaTerikat("");
         setTokenRowId(null);
         setOrderingSecret("");
       } else {
+        try {
+          sessionStorage.setItem(ORDER_TABLE_TOKEN_STORAGE_KEY, token);
+        } catch {
+          /* ignore */
+        }
+        notifyOrderTokenChanged();
         setGateOk(true);
         setMejaTerikat(data.nomor_meja ?? "");
         setTokenRowId(data.token_row_id ?? null);
         setOrderingSecret(token);
       }
     } catch {
+      try {
+        sessionStorage.removeItem(ORDER_TABLE_TOKEN_STORAGE_KEY);
+      } catch {
+        /* ignore */
+      }
+      notifyOrderTokenChanged();
       setGateOk(false);
       setMejaTerikat("");
       setTokenRowId(null);
@@ -65,6 +93,19 @@ export default function OrderPageClient() {
     }
     verifyToken(rawToken);
   }, [rawToken, verifyToken]);
+
+  /** Buka /order dari bookmark tanpa ?t — pakai token tab ini jika ada. */
+  useEffect(() => {
+    if (rawToken.trim()) return;
+    try {
+      const saved = sessionStorage.getItem(ORDER_TABLE_TOKEN_STORAGE_KEY)?.trim();
+      if (saved) {
+        router.replace(`/order?t=${encodeURIComponent(saved)}`);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [rawToken, router]);
 
   const handleKonfirmasi = async () => {
     if (!namaPemesan.trim() || !mejaTerikat.trim() || !orderingSecret) return;

@@ -2,13 +2,30 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X, ShoppingCart } from "lucide-react";
+import {
+  ORDER_TABLE_TOKEN_STORAGE_KEY,
+  ORDER_TOKEN_CHANGED_EVENT,
+} from "@/lib/orderSessionToken";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
 
+function computeOrderHref() {
+  if (typeof window === "undefined") return "/order";
+  try {
+    const secret = sessionStorage.getItem(ORDER_TABLE_TOKEN_STORAGE_KEY)?.trim();
+    return secret ? `/order?t=${encodeURIComponent(secret)}` : "/order";
+  } catch {
+    return "/order";
+  }
+}
+
 export default function Navbar() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [orderHref, setOrderHref] = useState("/order");
   const { totalItem } = useCart();
   const { lang, setLang, t } = useLanguage();
 
@@ -23,6 +40,17 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    const sync = () => setOrderHref(computeOrderHref());
+    sync();
+    window.addEventListener(ORDER_TOKEN_CHANGED_EVENT, sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener(ORDER_TOKEN_CHANGED_EVENT, sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, [pathname]);
 
   return (
     <header
@@ -52,7 +80,7 @@ export default function Navbar() {
               {t("nav.tentang")}
             </Link>
             <Link
-              href="/order"
+              href={orderHref}
               className="relative flex items-center gap-1 text-amber-500 hover:text-amber-300 transition"
             >
               <ShoppingCart className="w-4 h-4" />
@@ -122,7 +150,7 @@ export default function Navbar() {
             {t("nav.tentang")}
           </Link>
           <Link
-            href="/order"
+            href={orderHref}
             onClick={() => setIsOpen(false)}
             className="py-3 border-b border-gray-800 flex items-center gap-2 text-amber-500 hover:text-amber-300 transition"
           >

@@ -88,30 +88,3 @@ export async function POST(request) {
     );
   }
 }
-
-export async function GET() {
-  if (!supabaseAdmin) {
-    return NextResponse.json(
-      { error: "Supabase belum dikonfigurasi" },
-      { status: 500 }
-    );
-  }
-
-  try {
-    const { data, error } = await supabaseAdmin
-      .from("orders")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data);
-  } catch (err) {
-    return NextResponse.json(
-      { error: "Terjadi kesalahan server" },
-      { status: 500 }
-    );
-  }
-}
