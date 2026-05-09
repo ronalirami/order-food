@@ -48,3 +48,37 @@ export async function rotateOrderTokenForMeja(nomor_meja, request) {
     orderUrl,
   };
 }
+
+/**
+ * Tanpa rotate — pakai secret aktif satu meja untuk URL QR (tamu tidak perlu ganti cetakan).
+ */
+export async function getStableOrderUrlForMeja(nomor_meja, request) {
+  const meja = typeof nomor_meja === "string" ? nomor_meja.trim() : "";
+  if (!meja || !supabaseAdmin) {
+    throw new Error(!meja ? "nomor_meja kosong" : "Supabase admin tidak tersedia");
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from("order_table_tokens")
+    .select("secret, expires_at")
+    .eq("nomor_meja", meja)
+    .is("revoked_at", null)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data?.secret) {
+    throw new Error(error?.message ?? "Belum ada token aktif untuk meja ini — buat QR di halaman Token meja.");
+  }
+
+  const base =
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
+    `${request.headers.get("x-forwarded-proto") || "http"}://${request.headers.get("host") || "localhost:3000"}`;
+
+  return {
+    nomor_meja: meja,
+    secret: data.secret,
+    expires_at: data.expires_at,
+    orderUrl: `${base}/order?t=${encodeURIComponent(data.secret)}`,
+  };
+}

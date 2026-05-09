@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import Link from "next/link";
 import OrderUrlQr from "@/components/OrderUrlQr";
 import { createKasirBeep } from "@/lib/kasirBeep";
+import { shouldRotateOrderQrAfterPayment } from "@/lib/orderQrPolicy";
 
 const SESSION_KEY = "kasir_table_token_secret";
 /** Penyegaran daftar pesanan saat tab aktif (detik). */
@@ -156,9 +157,10 @@ export default function AdminPage() {
       if (!res.ok) throw new Error(data.error || "Gagal");
       setActionMsg({
         type: "ok",
-        text: `Meja ${nomorMeja}: lunas & QR baru. Cetak QR di bawah untuk tamu berikutnya.`,
+        text: data.message || `Meja ${nomorMeja}: ditandai lunas.`,
         url: data.orderUrl,
         nomor_meja: data.nomor_meja ?? nomorMeja,
+        showQrPreview: data.qr_rotated !== false,
       });
       await fetchAndApplyOrders(true);
     } catch (e) {
@@ -182,6 +184,8 @@ export default function AdminPage() {
     !error &&
     !!(kasirSecret.trim() ||
       (typeof window !== "undefined" ? sessionStorage.getItem(SESSION_KEY)?.trim() ?? "" : ""));
+
+  const rotateQrAfterPay = shouldRotateOrderQrAfterPayment();
 
   return (
     <section className="min-h-screen bg-black text-white px-6 md:px-20" style={{ paddingTop: "8rem", paddingBottom: "4rem" }}>
@@ -211,8 +215,17 @@ export default function AdminPage() {
 
         <div className="bg-[#0d0d0d] border border-gray-800 rounded-xl p-4 mb-8 space-y-3">
           <p className="text-gray-400 text-sm">
-            Untuk <strong className="text-[#F4EAD0]">Bayar lunas & putar QR</strong>, isi kode yang sama dengan{" "}
-            <code className="text-gray-500">TABLE_TOKEN_ROTATE_SECRET</code> di server. Simpan sekali per tab.
+            Untuk{" "}
+            <strong className="text-[#F4EAD0]">
+              {rotateQrAfterPay ? "Bayar lunas & ganti QR" : "Bayar lunas (QR meja tetap)"}
+            </strong>
+            , isi kode yang sama dengan <code className="text-gray-500">TABLE_TOKEN_ROTATE_SECRET</code> di
+            server. Simpan sekali per tab.
+            {!rotateQrAfterPay && (
+              <span className="block mt-2 text-emerald-500/85">
+                Mode Joyfull aktif — tempelan QR tidak perlu diganti setelah tiap pembayaran.
+              </span>
+            )}
           </p>
           <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
             <input
@@ -236,7 +249,7 @@ export default function AdminPage() {
               className={`text-sm p-3 rounded-lg ${actionMsg.type === "ok" ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"}`}
             >
               <p>{actionMsg.text}</p>
-              {actionMsg.type === "ok" && actionMsg.url && (
+              {actionMsg.type === "ok" && actionMsg.url && actionMsg.showQrPreview !== false && (
                 <div className="mt-4 flex flex-col items-stretch gap-3">
                   <OrderUrlQr url={actionMsg.url} label={actionMsg.nomor_meja ? `Meja ${actionMsg.nomor_meja}` : "Scan untuk order"} />
                   <textarea
@@ -310,8 +323,12 @@ export default function AdminPage() {
                       {actionKey === order.id
                         ? "Memproses…"
                         : order.payment_status === "lunas"
-                          ? "Putar QR baru (tamu berikutnya)"
-                          : "Bayar lunas & putar QR meja"}
+                          ? rotateQrAfterPay
+                            ? "Putar QR baru (tamu berikutnya)"
+                            : "Sudah lunas (QR sama)"
+                          : rotateQrAfterPay
+                            ? "Bayar lunas & putar QR meja"
+                            : "Bayar lunas"}
                     </button>
                   </div>
                 </div>
