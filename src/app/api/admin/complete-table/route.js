@@ -42,7 +42,7 @@ export async function POST(request) {
   try {
     const { error: payErr } = await supabaseAdmin
       .from("orders")
-      .update({ payment_status: "lunas" })
+      .update({ payment_status: "lunas", status: "completed" })
       .eq("nomor_meja", meja);
 
     if (payErr) {
