@@ -34,7 +34,7 @@ export default function AdminMejaTokenPage() {
   };
 
   return (
-    <section className="min-h-screen bg-black text-white px-6 md:px-20" style={{ paddingTop: "8rem", paddingBottom: "4rem" }}>
+    <section className="min-h-screen bg-black text-white px-6 md:px-20 pt-8 pb-16">
       <div className="max-w-xl mx-auto">
         <Link href="/tukangsanduak" className="text-gray-500 hover:text-[#F4EAD0] text-sm mb-6 inline-block">
           ← Daftar pesanan

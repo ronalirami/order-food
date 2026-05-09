@@ -1,6 +1,5 @@
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import AppChrome from "@/components/AppChrome";
 import Providers from "@/components/Providers";
 import { Lora, Poppins } from "next/font/google";
 
@@ -27,9 +26,7 @@ export default function RootLayout({ children }) {
       {/* Poppins untuk seluruh body */}
       <body className={`${poppins.className} min-h-screen flex flex-col bg-black text-white`}>
         <Providers>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <AppChrome>{children}</AppChrome>
         </Providers>
       </body>
     </html>

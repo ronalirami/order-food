@@ -188,7 +188,7 @@ export default function AdminPage() {
   const rotateQrAfterPay = shouldRotateOrderQrAfterPayment();
 
   return (
-    <section className="min-h-screen bg-black text-white px-6 md:px-20" style={{ paddingTop: "8rem", paddingBottom: "4rem" }}>
+    <section className="min-h-screen bg-black text-white px-6 md:px-20 pt-8 pb-16">
       <div className="max-w-4xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div className="flex flex-col gap-2">
@@ -206,9 +206,6 @@ export default function AdminPage() {
               className="text-amber-400/90 hover:text-amber-300 transition border border-amber-500/30 px-3 py-1.5 rounded-lg"
             >
               QR & token meja
-            </Link>
-            <Link href="/" className="text-gray-400 hover:text-[#F4EAD0] transition">
-              ← Kembali ke Beranda
             </Link>
           </div>
         </div>
