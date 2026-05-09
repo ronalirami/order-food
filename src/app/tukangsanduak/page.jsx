@@ -9,6 +9,38 @@ import { shouldRotateOrderQrAfterPayment } from "@/lib/orderQrPolicy";
 const SESSION_KEY = "kasir_table_token_secret";
 /** Penyegaran daftar pesanan saat tab aktif (detik). */
 const LIVE_POLL_MS = 10_000;
+/** Slot meja restoran (dapur melihat per meja). */
+const JUMLAH_MEJA = 7;
+
+function sortOrdersDalamGrup(a, b) {
+  const lunasA = a.payment_status === "lunas" ? 1 : 0;
+  const lunasB = b.payment_status === "lunas" ? 1 : 0;
+  if (lunasA !== lunasB) return lunasA - lunasB;
+  return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+}
+
+/** @param {Array} orders */
+function kelompokkanPerMeja(orders) {
+  const slots = Array.from({ length: JUMLAH_MEJA }, (_, i) => ({
+    nomor: String(i + 1),
+    orders: [],
+  }));
+  const luar = [];
+  for (const o of orders) {
+    const m = String(o.nomor_meja ?? "").trim();
+    const n = Number.parseInt(m, 10);
+    if (!Number.isNaN(n) && n >= 1 && n <= JUMLAH_MEJA) {
+      slots[n - 1].orders.push(o);
+    } else {
+      luar.push(o);
+    }
+  }
+  for (const s of slots) {
+    s.orders.sort(sortOrdersDalamGrup);
+  }
+  luar.sort(sortOrdersDalamGrup);
+  return { slots, luar };
+}
 
 async function fetchOrdersFromApi(adminSecret) {
   const res = await fetch("/api/admin/orders", {
@@ -187,9 +219,107 @@ export default function AdminPage() {
 
   const rotateQrAfterPay = shouldRotateOrderQrAfterPayment();
 
+  const grouped = useMemo(() => kelompokkanPerMeja(orders), [orders]);
+  const pesananBelumLunas = useMemo(
+    () => orders.filter((o) => String(o.payment_status ?? "").toLowerCase() !== "lunas").length,
+    [orders],
+  );
+
+  const renderKartuPesanan = (order) => (
+    <div
+      key={order.id}
+      className={`bg-[#111] rounded-xl p-6 border transition-shadow duration-500 ${
+        glowById[order.id]
+          ? "border-amber-400/70 shadow-[0_0_24px_rgba(251,191,36,0.2)] ring-1 ring-amber-500/40"
+          : "border-gray-800"
+      }`}
+    >
+      <div className="flex justify-between items-start mb-4 gap-4 flex-wrap">
+        <div>
+          <p className="text-[#F4EAD0] font-semibold text-lg">{order.nama_pemesan}</p>
+          <p className="text-gray-500 text-sm">
+            Meja #{order.nomor_meja}
+            {order.payment_status && (
+              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-300">{order.payment_status}</span>
+            )}
+            {glowById[order.id] && (
+              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-amber-500/25 text-amber-300 animate-pulse">Baru</span>
+            )}
+          </p>
+        </div>
+        <div className="text-right flex flex-col items-end gap-2">
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-medium ${
+              order.status === "pending" ? "bg-amber-500/20 text-amber-400" : "bg-green-500/20 text-green-400"
+            }`}
+          >
+            {order.status}
+          </span>
+          <p className="text-gray-500 text-xs">{formatWaktu(order.created_at)}</p>
+          <button
+            type="button"
+            disabled={actionKey === order.id}
+            onClick={() => selesaiMeja(order.nomor_meja, order.id)}
+            className="text-xs bg-[#F4EAD0] text-black px-3 py-2 rounded-lg font-medium hover:bg-[#e8dbb8] disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
+          >
+            {actionKey === order.id
+              ? "Memproses…"
+              : order.payment_status === "lunas"
+                ? rotateQrAfterPay
+                  ? "Putar QR baru (tamu berikutnya)"
+                  : "Sudah lunas (QR sama)"
+                : rotateQrAfterPay
+                  ? "Bayar lunas & putar QR meja"
+                  : "Bayar lunas"}
+          </button>
+        </div>
+      </div>
+
+      <div className="border-t border-gray-800 pt-4 space-y-2">
+        {order.items?.map((item, i) => (
+          <div key={i} className="flex justify-between text-sm text-gray-300">
+            <span>
+              {item.nama} × {item.qty}
+            </span>
+            <span className="text-[#F4EAD0]">¥{formatYen(item.harga * item.qty)}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="border-t border-gray-800 pt-4 mt-4 flex justify-between font-semibold text-[#F4EAD0]">
+        <span>Total</span>
+        <span>¥{formatYen(order.total_harga)}</span>
+      </div>
+    </div>
+  );
+
+  const renderBlokMeja = (nomorMejaLabel, daftarOrder) => (
+    <div
+      key={nomorMejaLabel}
+      className="rounded-xl border border-gray-800 bg-[#0d0d0d] overflow-hidden flex flex-col min-h-[120px]"
+    >
+      <div className="flex items-center justify-between gap-2 px-4 py-3 bg-[#141414] border-b border-gray-800 shrink-0">
+        <h2 className="text-lg font-serif text-[#F4EAD0]">Meja {nomorMejaLabel}</h2>
+        <span className="text-xs text-gray-500 tabular-nums">
+          {daftarOrder.length} pesanan
+          {daftarOrder.some((o) => String(o.payment_status ?? "").toLowerCase() !== "lunas") && (
+            <span className="ml-2 text-amber-400/95">● belum lunas</span>
+          )}
+        </span>
+      </div>
+      <div className="p-4 space-y-4 flex-1">
+        {daftarOrder.length === 0 ? (
+          <p className="text-sm text-gray-600 italic">Tidak ada pesanan aktif</p>
+        ) : (
+          daftarOrder.map((order) => renderKartuPesanan(order))
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <section className="min-h-screen bg-black text-white px-6 md:px-20 pt-8 pb-16">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-serif text-[#F4EAD0]">Daftar Pesanan</h1>
@@ -265,88 +395,40 @@ export default function AdminPage() {
           <p className="text-gray-400">Memuat...</p>
         ) : error ? (
           <p className="text-red-400">{error}</p>
-        ) : orders.length === 0 ? (
-          needsKasirSecret ? (
-            <p className="text-gray-400">
-              Ketik kode yang sama dengan <code className="text-gray-500">TABLE_TOKEN_ROTATE_SECRET</code> di{" "}
-              <code className="text-gray-500">.env.local</code>, lalu ketuk{" "}
-              <strong className="text-[#F4EAD0]">Simpan di browser</strong> — tanpa itu daftar tidak dimuat dari
-              database.
-            </p>
-          ) : (
-            <p className="text-gray-400">Belum ada pesanan.</p>
-          )
+        ) : needsKasirSecret ? (
+          <p className="text-gray-400">
+            Ketik kode yang sama dengan <code className="text-gray-500">TABLE_TOKEN_ROTATE_SECRET</code> di{" "}
+            <code className="text-gray-500">.env.local</code>, lalu ketuk{" "}
+            <strong className="text-[#F4EAD0]">Simpan di browser</strong> — tanpa itu daftar tidak dimuat dari
+            database.
+          </p>
         ) : (
           <div className="space-y-6">
-            {orders.map((order) => (
-              <div
-                key={order.id}
-                className={`bg-[#111] rounded-xl p-6 border transition-shadow duration-500 ${
-                  glowById[order.id] ? "border-amber-400/70 shadow-[0_0_24px_rgba(251,191,36,0.2)] ring-1 ring-amber-500/40" : "border-gray-800"
-                }`}
-              >
-                <div className="flex justify-between items-start mb-4 gap-4 flex-wrap">
-                  <div>
-                    <p className="text-[#F4EAD0] font-semibold text-lg">{order.nama_pemesan}</p>
-                    <p className="text-gray-500 text-sm">
-                      Meja #{order.nomor_meja}
-                      {order.payment_status && (
-                        <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-300">
-                          {order.payment_status}
-                        </span>
-                      )}
-                      {glowById[order.id] && (
-                        <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-amber-500/25 text-amber-300 animate-pulse">
-                          Baru
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                  <div className="text-right flex flex-col items-end gap-2">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        order.status === "pending" ? "bg-amber-500/20 text-amber-400" : "bg-green-500/20 text-green-400"
-                      }`}
-                    >
-                      {order.status}
-                    </span>
-                    <p className="text-gray-500 text-xs">{formatWaktu(order.created_at)}</p>
-                    <button
-                      type="button"
-                      disabled={actionKey === order.id}
-                      onClick={() => selesaiMeja(order.nomor_meja, order.id)}
-                      className="text-xs bg-[#F4EAD0] text-black px-3 py-2 rounded-lg font-medium hover:bg-[#e8dbb8] disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
-                    >
-                      {actionKey === order.id
-                        ? "Memproses…"
-                        : order.payment_status === "lunas"
-                          ? rotateQrAfterPay
-                            ? "Putar QR baru (tamu berikutnya)"
-                            : "Sudah lunas (QR sama)"
-                          : rotateQrAfterPay
-                            ? "Bayar lunas & putar QR meja"
-                            : "Bayar lunas"}
-                    </button>
-                  </div>
-                </div>
+            <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400 border border-gray-800 rounded-xl px-4 py-3 bg-[#111]">
+              <span>
+                Ringkasan: <strong className="text-[#F4EAD0]">{orders.length}</strong> pesanan total
+              </span>
+              <span className="text-gray-600">|</span>
+              <span>
+                Belum lunas: <strong className="text-amber-400/95">{pesananBelumLunas}</strong>
+              </span>
+              <span className="text-gray-600 hidden sm:inline">|</span>
+              <span className="hidden sm:inline">Tampilan {JUMLAH_MEJA} meja</span>
+            </div>
 
-                <div className="border-t border-gray-800 pt-4 space-y-2">
-                  {order.items?.map((item, i) => (
-                    <div key={i} className="flex justify-between text-sm text-gray-300">
-                      <span>
-                        {item.nama} × {item.qty}
-                      </span>
-                      <span className="text-[#F4EAD0]">¥{formatYen(item.harga * item.qty)}</span>
-                    </div>
-                  ))}
-                </div>
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {grouped.slots.map((slot) => renderBlokMeja(slot.nomor, slot.orders))}
+            </div>
 
-                <div className="border-t border-gray-800 pt-4 mt-4 flex justify-between font-semibold text-[#F4EAD0]">
-                  <span>Total</span>
-                  <span>¥{formatYen(order.total_harga)}</span>
+            {grouped.luar.length > 0 && (
+              <div className="rounded-xl border border-amber-500/35 bg-[#161008] overflow-hidden">
+                <div className="px-4 py-3 bg-amber-500/10 border-b border-amber-500/25">
+                  <h2 className="text-lg font-serif text-amber-200">Nomor meja di luar 1–{JUMLAH_MEJA}</h2>
+                  <p className="text-xs text-amber-200/70 mt-1">Sesuaikan label meja atau satukan dengan slot 1–7.</p>
                 </div>
+                <div className="p-4 space-y-4">{grouped.luar.map((order) => renderKartuPesanan(order))}</div>
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>
