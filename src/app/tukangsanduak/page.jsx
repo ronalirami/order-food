@@ -12,10 +12,12 @@ const LIVE_POLL_MS = 10_000;
 /** Slot meja restoran (dapur melihat per meja). */
 const JUMLAH_MEJA = 7;
 
+/** Di daftar dapur: sembunyikan yang sudah lunas (ada di halaman Riwayat). */
+function bukanLunas(order) {
+  return String(order.payment_status ?? "").toLowerCase() !== "lunas";
+}
+
 function sortOrdersDalamGrup(a, b) {
-  const lunasA = a.payment_status === "lunas" ? 1 : 0;
-  const lunasB = b.payment_status === "lunas" ? 1 : 0;
-  if (lunasA !== lunasB) return lunasA - lunasB;
   return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
 }
 
@@ -219,11 +221,9 @@ export default function AdminPage() {
 
   const rotateQrAfterPay = shouldRotateOrderQrAfterPayment();
 
-  const grouped = useMemo(() => kelompokkanPerMeja(orders), [orders]);
-  const pesananBelumLunas = useMemo(
-    () => orders.filter((o) => String(o.payment_status ?? "").toLowerCase() !== "lunas").length,
-    [orders],
-  );
+  const ordersAktif = useMemo(() => orders.filter(bukanLunas), [orders]);
+  const grouped = useMemo(() => kelompokkanPerMeja(ordersAktif), [ordersAktif]);
+  const jumlahSudahLunas = orders.length - ordersAktif.length;
 
   const renderKartuPesanan = (order) => (
     <div
@@ -302,8 +302,8 @@ export default function AdminPage() {
         <h2 className="text-lg font-serif text-[#F4EAD0]">Meja {nomorMejaLabel}</h2>
         <span className="text-xs text-gray-500 tabular-nums">
           {daftarOrder.length} pesanan
-          {daftarOrder.some((o) => String(o.payment_status ?? "").toLowerCase() !== "lunas") && (
-            <span className="ml-2 text-amber-400/95">● belum lunas</span>
+          {daftarOrder.some((o) => String(o.payment_status ?? "").toLowerCase() === "belum_bayar") && (
+            <span className="ml-2 text-amber-400/95">● belum bayar</span>
           )}
         </span>
       </div>
@@ -353,7 +353,12 @@ export default function AdminPage() {
               {rotateQrAfterPay ? "Bayar lunas & ganti QR" : "Bayar lunas (QR meja tetap)"}
             </strong>
             , isi kode yang sama dengan <code className="text-gray-500">TABLE_TOKEN_ROTATE_SECRET</code> di
-            server. Simpan sekali per tab.
+            server. Simpan sekali per tab. Hanya pesanan <strong className="text-gray-300">belum lunas</strong>{" "}
+            tampil di bawah — yang sudah lunas hanya di halaman{" "}
+            <Link href="/tukangsanduak/riwayat" className="text-amber-400/85 underline">
+              Riwayat transaksi
+            </Link>
+            .
             {!rotateQrAfterPay && (
               <span className="block mt-2 text-emerald-500/85">
                 Mode Joyfull aktif — tempelan QR tidak perlu diganti setelah tiap pembayaran.
@@ -412,14 +417,22 @@ export default function AdminPage() {
           <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400 border border-gray-800 rounded-xl px-4 py-3 bg-[#111]">
               <span>
-                Ringkasan: <strong className="text-[#F4EAD0]">{orders.length}</strong> pesanan total
+                Antrian dapur: <strong className="text-[#F4EAD0]">{ordersAktif.length}</strong> pesanan
               </span>
-              <span className="text-gray-600">|</span>
-              <span>
-                Belum lunas: <strong className="text-amber-400/95">{pesananBelumLunas}</strong>
-              </span>
+              {jumlahSudahLunas > 0 && (
+                <>
+                  <span className="text-gray-600">|</span>
+                  <span className="text-gray-500">
+                    Sudah lunas: <strong className="text-gray-400">{jumlahSudahLunas}</strong> (
+                    <Link href="/tukangsanduak/riwayat" className="text-amber-400/90 hover:text-amber-300 underline">
+                      Riwayat transaksi
+                    </Link>
+                    )
+                  </span>
+                </>
+              )}
               <span className="text-gray-600 hidden sm:inline">|</span>
-              <span className="hidden sm:inline">Tampilan {JUMLAH_MEJA} meja</span>
+              <span className="hidden sm:inline">Meja 1–{JUMLAH_MEJA} (tanpa yang sudah lunas)</span>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
