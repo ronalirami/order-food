@@ -332,6 +332,12 @@ export default function AdminPage() {
           </div>
           <div className="flex flex-wrap gap-3 text-sm">
             <Link
+              href="/tukangsanduak/riwayat"
+              className="text-gray-300 hover:text-[#F4EAD0] transition border border-gray-600 px-3 py-1.5 rounded-lg"
+            >
+              Riwayat transaksi
+            </Link>
+            <Link
               href="/tukangsanduak/meja"
               className="text-amber-400/90 hover:text-amber-300 transition border border-amber-500/30 px-3 py-1.5 rounded-lg"
             >
