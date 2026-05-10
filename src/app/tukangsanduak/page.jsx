@@ -308,20 +308,8 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="bg-[#0d0d0d] border border-gray-800 rounded-xl p-4 mb-8 space-y-3">
-          <p className="text-gray-400 text-sm">
-            Pembayaran:{" "}
-            <strong className="text-[#F4EAD0]">
-              {rotateQrAfterPay ? "Bayar lunas & ganti QR" : "Bayar lunas (QR meja tetap)"}
-            </strong>
-            . <strong className="text-gray-400">Satu halaman untuk meja 1–7</strong> — hanya pesanan{" "}
-            <strong className="text-gray-300">belum lunas</strong> tampil di bawah; yang sudah lunas ada di{" "}
-            <Link href="/tukangsanduak/riwayat" className="text-amber-400/85 underline">
-              Riwayat transaksi
-            </Link>
-            .
-          </p>
-          {actionMsg && (
+        {actionMsg ? (
+          <div className="bg-[#0d0d0d] border border-gray-800 rounded-xl p-4 mb-8 space-y-3">
             <div
               className={`text-sm p-3 rounded-lg ${actionMsg.type === "ok" ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"}`}
             >
@@ -338,8 +326,8 @@ export default function AdminPage() {
                 </div>
               )}
             </div>
-          )}
-        </div>
+          </div>
+        ) : null}
 
         {loading ? (
           <p className="text-gray-400">Memuat...</p>
