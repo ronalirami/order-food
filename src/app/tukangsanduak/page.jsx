@@ -288,7 +288,7 @@ export default function AdminPage() {
             {liveActive && (
               <p className="text-xs text-emerald-400/90 flex items-center gap-2 flex-wrap">
                 <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0" aria-hidden />
-                Live — penyegaran otomatis tiap ±{Math.round(LIVE_POLL_MS / 1000)} s (tab aktif).
+                Live
               </p>
             )}
           </div>
@@ -320,11 +320,6 @@ export default function AdminPage() {
               Riwayat transaksi
             </Link>
             .
-            {!rotateQrAfterPay && (
-              <span className="block mt-2 text-emerald-500/85">
-                Mode Joyfull aktif — tempelan QR tidak perlu diganti setelah tiap pembayaran.
-              </span>
-            )}
           </p>
           {actionMsg && (
             <div
