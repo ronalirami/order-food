@@ -3,10 +3,10 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import Link from "next/link";
 import OrderUrlQr from "@/components/OrderUrlQr";
+import KasirSessionBar from "./KasirSessionBar";
 import { createKasirBeep } from "@/lib/kasirBeep";
 import { shouldRotateOrderQrAfterPayment } from "@/lib/orderQrPolicy";
 
-const SESSION_KEY = "kasir_table_token_secret";
 /** Penyegaran daftar pesanan saat tab aktif (detik). */
 const LIVE_POLL_MS = 10_000;
 /** Slot meja restoran (dapur melihat per meja). */
@@ -44,11 +44,13 @@ function kelompokkanPerMeja(orders) {
   return { slots, luar };
 }
 
-async function fetchOrdersFromApi(adminSecret) {
-  const res = await fetch("/api/admin/orders", {
-    headers: { "x-admin-secret": adminSecret.trim() },
-  });
+async function fetchOrdersFromApi() {
+  const res = await fetch("/api/admin/orders");
   const data = await res.json().catch(() => ({}));
+  if (res.status === 401) {
+    window.location.href = "/tukangsanduak/masuk";
+    throw new Error("Sesi habis — masuk lagi.");
+  }
   if (!res.ok) throw new Error(data.error || `Gagal (${res.status})`);
   return Array.isArray(data) ? data : [];
 }
@@ -57,23 +59,12 @@ export default function AdminPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [kasirSecret, setKasirSecret] = useState("");
-  const [needsKasirSecret, setNeedsKasirSecret] = useState(false);
   const [actionKey, setActionKey] = useState(null);
   const [actionMsg, setActionMsg] = useState(null);
   const [glowById, setGlowById] = useState({});
 
   const prevIdsRef = useRef(null);
   const beep = useMemo(() => createKasirBeep(), []);
-
-  useEffect(() => {
-    try {
-      const s = sessionStorage.getItem(SESSION_KEY);
-      if (s) setKasirSecret(s);
-    } catch {
-      /* ignore */
-    }
-  }, []);
 
   const applyGlowForNewOrders = useCallback((newcomerIds) => {
     if (newcomerIds.length === 0) return;
@@ -95,21 +86,9 @@ export default function AdminPage() {
 
   const fetchAndApplyOrders = useCallback(
     async (silent) => {
-      const secret =
-        kasirSecret.trim() ||
-        (typeof window !== "undefined" ? sessionStorage.getItem(SESSION_KEY) ?? "" : "");
-      if (!secret.trim()) {
-        setNeedsKasirSecret(true);
-        setOrders([]);
-        setError("");
-        prevIdsRef.current = null;
-        setLoading(false);
-        return;
-      }
-      setNeedsKasirSecret(false);
       if (!silent) setLoading(true);
       try {
-        const data = await fetchOrdersFromApi(secret.trim());
+        const data = await fetchOrdersFromApi();
         const idSet = new Set(data.map((o) => String(o.id)));
 
         if (prevIdsRef.current !== null) {
@@ -126,26 +105,18 @@ export default function AdminPage() {
       } catch (e) {
         setOrders([]);
         setError(e?.message || "Gagal memuat data");
-        /* Pertahankan prevIdsRef agar penyegaran berikut tidak menganggap semua baru */
       } finally {
         if (!silent) setLoading(false);
       }
     },
-    [kasirSecret, beep, applyGlowForNewOrders],
+    [beep, applyGlowForNewOrders],
   );
 
   useEffect(() => {
-    fetchAndApplyOrders(false);
+    void fetchAndApplyOrders(false);
   }, [fetchAndApplyOrders]);
 
-  /* Live polling: hanya saat tab terlihat + kode tersedia */
   useEffect(() => {
-    if (needsKasirSecret) return;
-    const secret =
-      kasirSecret.trim() ||
-      (typeof window !== "undefined" ? sessionStorage.getItem(SESSION_KEY)?.trim() ?? "" : "");
-    if (!secret) return;
-
     const id = window.setInterval(() => {
       if (document.visibilityState !== "visible") return;
       void fetchAndApplyOrders(true);
@@ -160,34 +131,22 @@ export default function AdminPage() {
       window.clearInterval(id);
       window.removeEventListener("focus", onFocus);
     };
-  }, [needsKasirSecret, kasirSecret, fetchAndApplyOrders]);
-
-  const simpanKodeSesi = async () => {
-    try {
-      beep.unlockFromUserGesture();
-      sessionStorage.setItem(SESSION_KEY, kasirSecret);
-      setActionMsg({ type: "ok", text: "Kode disimpan untuk sesi tab ini." });
-      setTimeout(() => setActionMsg(null), 3000);
-      await fetchAndApplyOrders(true);
-    } catch {
-      setActionMsg({ type: "err", text: "Tidak bisa simpan (browser)." });
-    }
-  };
+  }, [fetchAndApplyOrders]);
 
   const selesaiMeja = async (nomorMeja, orderId) => {
-    if (!kasirSecret.trim()) {
-      setActionMsg({ type: "err", text: "Isi kode kasir di atas dulu (sama dengan TABLE_TOKEN_ROTATE_SECRET)." });
-      return;
-    }
     setActionKey(orderId);
     setActionMsg(null);
     try {
       const res = await fetch("/api/admin/complete-table", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nomor_meja: nomorMeja, admin_secret: kasirSecret.trim() }),
+        body: JSON.stringify({ nomor_meja: nomorMeja }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401) {
+        window.location.href = "/tukangsanduak/masuk";
+        throw new Error("Sesi habis");
+      }
       if (!res.ok) throw new Error(data.error || "Gagal");
       setActionMsg({
         type: "ok",
@@ -214,10 +173,7 @@ export default function AdminPage() {
   };
 
   const liveActive =
-    !needsKasirSecret &&
-    !error &&
-    !!(kasirSecret.trim() ||
-      (typeof window !== "undefined" ? sessionStorage.getItem(SESSION_KEY)?.trim() ?? "" : ""));
+    !error && !(loading && orders.length === 0); /* sudah dapat data pertama atau lagi refresh */
 
   const rotateQrAfterPay = shouldRotateOrderQrAfterPayment();
 
@@ -260,6 +216,7 @@ export default function AdminPage() {
             type="button"
             disabled={actionKey === order.id}
             onClick={() => selesaiMeja(order.nomor_meja, order.id)}
+            onPointerDown={() => beep.unlockFromUserGesture()}
             className="text-xs bg-[#F4EAD0] text-black px-3 py-2 rounded-lg font-medium hover:bg-[#e8dbb8] disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
           >
             {actionKey === order.id
@@ -318,15 +275,20 @@ export default function AdminPage() {
   );
 
   return (
-    <section className="min-h-screen bg-black text-white px-6 md:px-20 pt-8 pb-16">
+    <section
+      className="min-h-screen bg-black text-white px-6 md:px-20 pt-8 pb-16"
+      onPointerDown={() => beep.unlockFromUserGesture()}
+    >
       <div className="max-w-6xl mx-auto">
+        <KasirSessionBar />
+
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-serif text-[#F4EAD0]">Daftar Pesanan</h1>
             {liveActive && (
               <p className="text-xs text-emerald-400/90 flex items-center gap-2 flex-wrap">
                 <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0" aria-hidden />
-                Live — penyegaran otomatis tiap ±{Math.round(LIVE_POLL_MS / 1000)} s (tab aktif). Bunyi hidup setelah &quot;Simpan di browser&quot;.
+                Live — penyegaran otomatis tiap ±{Math.round(LIVE_POLL_MS / 1000)} s (tab aktif).
               </p>
             )}
           </div>
@@ -348,13 +310,12 @@ export default function AdminPage() {
 
         <div className="bg-[#0d0d0d] border border-gray-800 rounded-xl p-4 mb-8 space-y-3">
           <p className="text-gray-400 text-sm">
-            Untuk{" "}
+            Pembayaran:{" "}
             <strong className="text-[#F4EAD0]">
               {rotateQrAfterPay ? "Bayar lunas & ganti QR" : "Bayar lunas (QR meja tetap)"}
             </strong>
-            , isi kode yang sama dengan <code className="text-gray-500">TABLE_TOKEN_ROTATE_SECRET</code> di
-            server. Simpan sekali per tab. Hanya pesanan <strong className="text-gray-300">belum lunas</strong>{" "}
-            tampil di bawah — yang sudah lunas hanya di halaman{" "}
+            . <strong className="text-gray-400">Satu halaman untuk meja 1–7</strong> — hanya pesanan{" "}
+            <strong className="text-gray-300">belum lunas</strong> tampil di bawah; yang sudah lunas ada di{" "}
             <Link href="/tukangsanduak/riwayat" className="text-amber-400/85 underline">
               Riwayat transaksi
             </Link>
@@ -365,23 +326,6 @@ export default function AdminPage() {
               </span>
             )}
           </p>
-          <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
-            <input
-              type="password"
-              value={kasirSecret}
-              onChange={(e) => setKasirSecret(e.target.value)}
-              placeholder="Kode kasir"
-              className="flex-1 bg-black border border-gray-700 rounded-lg px-3 py-2 text-sm focus:border-[#F4EAD0] outline-none"
-              autoComplete="off"
-            />
-            <button
-              type="button"
-              onClick={simpanKodeSesi}
-              className="text-sm border border-gray-600 px-3 py-2 rounded-lg hover:border-[#F4EAD0] transition shrink-0"
-            >
-              Simpan di browser
-            </button>
-          </div>
           {actionMsg && (
             <div
               className={`text-sm p-3 rounded-lg ${actionMsg.type === "ok" ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"}`}
@@ -406,13 +350,6 @@ export default function AdminPage() {
           <p className="text-gray-400">Memuat...</p>
         ) : error ? (
           <p className="text-red-400">{error}</p>
-        ) : needsKasirSecret ? (
-          <p className="text-gray-400">
-            Ketik kode yang sama dengan <code className="text-gray-500">TABLE_TOKEN_ROTATE_SECRET</code> di{" "}
-            <code className="text-gray-500">.env.local</code>, lalu ketuk{" "}
-            <strong className="text-[#F4EAD0]">Simpan di browser</strong> — tanpa itu daftar tidak dimuat dari
-            database.
-          </p>
         ) : (
           <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400 border border-gray-800 rounded-xl px-4 py-3 bg-[#111]">

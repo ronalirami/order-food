@@ -3,10 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import OrderUrlQr from "@/components/OrderUrlQr";
+import KasirSessionBar from "../KasirSessionBar";
 
 export default function AdminMejaTokenPage() {
   const [nomor_meja, setNomor_meja] = useState("");
-  const [admin_secret, setAdmin_secret] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
@@ -20,26 +20,35 @@ export default function AdminMejaTokenPage() {
       const res = await fetch("/api/admin/table-token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nomor_meja, admin_secret }),
+        body: JSON.stringify({ nomor_meja }),
       });
       const data = await res.json();
+      if (res.status === 401) {
+        window.location.href = "/tukangsanduak/masuk";
+        throw new Error("Sesi habis");
+      }
       if (!res.ok) throw new Error(data.error || "Gagal");
       setResult(data);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
-      setAdmin_secret("");
     }
   };
 
   return (
     <section className="min-h-screen bg-black text-white px-6 md:px-20 pt-8 pb-16">
       <div className="max-w-xl mx-auto">
+        <KasirSessionBar />
+
         <Link href="/tukangsanduak" className="text-gray-500 hover:text-[#F4EAD0] text-sm mb-6 inline-block">
           ← Daftar pesanan
         </Link>
         <h1 className="text-3xl font-serif text-[#F4EAD0] mb-2">QR & token per meja</h1>
+        <p className="text-gray-500 text-sm mb-4 leading-relaxed">
+          <strong className="text-gray-400">Satu login kasir</strong> untuk semua meja — tanpa kode panjang di
+          form.
+        </p>
         <p className="text-gray-500 text-sm mb-8 leading-relaxed">
           Buat token baru untuk sebuah meja. Token lama langsung dibatalkan — QR/foto lawas tidak lagi bisa dipakai order.
           Masa hidup token mengikuti env <code className="text-gray-400">ORDER_TOKEN_TTL_HOURS</code> (default 4 jam).
@@ -54,18 +63,6 @@ export default function AdminMejaTokenPage() {
               required
               className="w-full px-4 py-2 rounded-lg bg-black border border-gray-700 text-white focus:border-[#F4EAD0] focus:outline-none"
               placeholder="contoh: 5"
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Kode akses pemutaran token</label>
-            <input
-              type="password"
-              value={admin_secret}
-              onChange={(e) => setAdmin_secret(e.target.value)}
-              required
-              className="w-full px-4 py-2 rounded-lg bg-black border border-gray-700 text-white focus:border-[#F4EAD0] focus:outline-none"
-              placeholder="TABLE_TOKEN_ROTATE_SECRET dari .env.local"
-              autoComplete="current-password"
             />
           </div>
           {error && <p className="text-red-400 text-sm">{error}</p>}
@@ -90,7 +87,6 @@ export default function AdminMejaTokenPage() {
               className="w-full h-24 text-xs bg-black border border-gray-700 rounded-lg p-3 text-gray-300 font-mono"
               value={result.orderUrl}
             />
-            <p className="text-gray-600 text-[10px]">Jangan share kode akses admin ke tamu.</p>
           </div>
         )}
       </div>

@@ -2,21 +2,17 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { shouldRotateOrderQrAfterPayment } from "@/lib/orderQrPolicy";
 import { getStableOrderUrlForMeja, rotateOrderTokenForMeja } from "@/lib/rotateOrderTokenServer";
+import { requireKasirAuthResponse } from "@/lib/requireKasirAuth";
 
 /**
- * POST { admin_secret, nomor_meja }
+ * POST { nomor_meja }
  * - Tandai semua pesanan di meja itu sebagai lunas
  * - Putar QR hanya jika NEXT_PUBLIC_ROTATE_ORDER_QR_AFTER_PAYMENT=true (default)
  */
-
 export async function POST(request) {
-  const rotateSecret = process.env.TABLE_TOKEN_ROTATE_SECRET;
-  if (!rotateSecret) {
-    return NextResponse.json(
-      { error: "TABLE_TOKEN_ROTATE_SECRET belum diset di .env.local" },
-      { status: 500 },
-    );
-  }
+  const gate = await requireKasirAuthResponse();
+  if (!gate.ok) return gate.response;
+
   if (!supabaseAdmin) {
     return NextResponse.json(
       { error: "SUPABASE_SERVICE_ROLE_KEY belum dikonfigurasi" },
@@ -31,10 +27,7 @@ export async function POST(request) {
     return NextResponse.json({ error: "Body JSON tidak valid" }, { status: 400 });
   }
 
-  const { admin_secret, nomor_meja } = body ?? {};
-  if (admin_secret !== rotateSecret) {
-    return NextResponse.json({ error: "Tidak diizinkan" }, { status: 403 });
-  }
+  const { nomor_meja } = body ?? {};
 
   const meja = typeof nomor_meja === "string" ? nomor_meja.trim() : "";
   if (!meja) {

@@ -1,22 +1,17 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { requireKasirAuthResponse } from "@/lib/requireKasirAuth";
 
 /**
  * GET — daftar pesanan untuk panel kasir.
- * Header wajib: x-admin-secret sama dengan TABLE_TOKEN_ROTATE_SECRET (service role di server).
+ * Akses: sesi Supabase Auth (middleware + pemeriksaan di route).
  */
-export async function GET(request) {
-  const rotateSecret = process.env.TABLE_TOKEN_ROTATE_SECRET;
-  const sent = request.headers.get("x-admin-secret") ?? "";
+export async function GET(_request) {
+  const gate = await requireKasirAuthResponse();
+  if (!gate.ok) return gate.response;
 
-  if (!rotateSecret) {
-    return NextResponse.json({ error: "TABLE_TOKEN_ROTATE_SECRET belum diset di server" }, { status: 500 });
-  }
   if (!supabaseAdmin) {
     return NextResponse.json({ error: "SUPABASE_SERVICE_ROLE_KEY belum dikonfigurasi" }, { status: 500 });
-  }
-  if (sent !== rotateSecret) {
-    return NextResponse.json({ error: "Tidak diizinkan" }, { status: 403 });
   }
 
   try {

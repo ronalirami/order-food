@@ -1,23 +1,20 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { rotateOrderTokenForMeja } from "@/lib/rotateOrderTokenServer";
+import { requireKasirAuthResponse } from "@/lib/requireKasirAuth";
 
 /**
- * POST { admin_secret, nomor_meja }
- * - Membuat token baru untuk meja (revoke token aktif sebelumnya)
+ * POST { nomor_meja }
+ * Membuat token baru untuk meja (revoke token aktif sebelumnya).
  */
 export async function POST(request) {
-  const rotateSecret = process.env.TABLE_TOKEN_ROTATE_SECRET;
-  if (!rotateSecret) {
-    return NextResponse.json(
-      { error: "TABLE_TOKEN_ROTATE_SECRET belum diset di .env.local" },
-      { status: 500 }
-    );
-  }
+  const gate = await requireKasirAuthResponse();
+  if (!gate.ok) return gate.response;
+
   if (!supabaseAdmin) {
     return NextResponse.json(
       { error: "SUPABASE_SERVICE_ROLE_KEY belum dikonfigurasi" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -28,10 +25,7 @@ export async function POST(request) {
     return NextResponse.json({ error: "Body JSON tidak valid" }, { status: 400 });
   }
 
-  const { admin_secret, nomor_meja } = body ?? {};
-  if (admin_secret !== rotateSecret) {
-    return NextResponse.json({ error: "Tidak diizinkan" }, { status: 403 });
-  }
+  const { nomor_meja } = body ?? {};
 
   const meja = typeof nomor_meja === "string" ? nomor_meja.trim() : "";
   if (!meja) {
@@ -51,7 +45,7 @@ export async function POST(request) {
     console.error("table-token:", err);
     return NextResponse.json(
       { error: err?.message ?? "Gagal membuat token" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
