@@ -6,6 +6,7 @@ export const translations = {
   id: {
     nav: {
       menu: "Menu",
+      nomorMenu: "Nomor menu",
       tentang: "Tentang",
       order: "Order",
     },
@@ -16,9 +17,29 @@ export const translations = {
       cardOrder: "Order",
       cardTentang: "Tentang",
     },
+    nomorMenu: {
+      title: "Pesan lewat nomor menu",
+      subtitle:
+        "Masukkan nomor yang tertera pada buku menu di meja Anda, sama seperti cetakan di kartu.",
+      placeholder: "Contoh: 5",
+      hint: 'Nomor menu sama dengan kolom id di aplikasi — saat ini 1 hingga 12.',
+      submit: "Lanjut ke menu",
+      invalid: "Nomor tidak ditemukan. Periksa buku menu lalu coba lagi.",
+      enterHint: 'Tekan "Lanjut" atau tombol masuk untuk membuka halaman pesanan.',
+    },
+    menuDetail: {
+      labelNomor: "Nomor menu",
+      qty: "Jumlah",
+      kurang: "Kurang",
+      tambah: "Tambah",
+      order: "Pesan & lanjut ke order",
+      lihatDaftar: "Lihat semua menu",
+      ketikNomorLagi: "Ketik nomor lain",
+    },
     menu: {
       title: "Daftar Menu",
       subtitle: "Pilihan hidangan terbaik dari dapur Minangkabau kami — autentik, lembut, dan penuh cita rasa.",
+      lewatNomor: "Pesan pakai nomor menu →",
       tambah: "+ Tambah",
       kategori: {
         makanan: "🍛 Makanan",
@@ -86,6 +107,7 @@ export const translations = {
   en: {
     nav: {
       menu: "Menu",
+      nomorMenu: "Menu number",
       tentang: "About",
       order: "Order",
     },
@@ -96,9 +118,29 @@ export const translations = {
       cardOrder: "Order",
       cardTentang: "About",
     },
+    nomorMenu: {
+      title: "Order by menu number",
+      subtitle:
+        "Enter the number shown in the menu booklet at your table, like the numbered items on Joyfull boards.",
+      placeholder: "e.g. 5",
+      hint: "Menu numbers match our item ids — currently 1 through 12.",
+      submit: "Go to dish",
+      invalid: "We could not find that number. Double-check your menu and try again.",
+      enterHint: 'Press Continue or tap Go on the keyboard.',
+    },
+    menuDetail: {
+      labelNomor: "Menu #",
+      qty: "Quantity",
+      kurang: "Less",
+      tambah: "More",
+      order: "Add to cart & checkout",
+      lihatDaftar: "Browse full menu",
+      ketikNomorLagi: "Enter another number",
+    },
     menu: {
       title: "Our Menu",
       subtitle: "The finest selection from our Minangkabau kitchen — authentic, tender, and full of flavor.",
+      lewatNomor: "Order with menu number →",
       tambah: "+ Add",
       kategori: {
         makanan: "🍛 Food",
@@ -166,6 +208,7 @@ export const translations = {
   ja: {
     nav: {
       menu: "メニュー",
+      nomorMenu: "番号から注文",
       tentang: "私たちについて",
       order: "注文",
     },
@@ -176,9 +219,29 @@ export const translations = {
       cardOrder: "注文",
       cardTentang: "私たちについて",
     },
+    nomorMenu: {
+      title: "メニュー番号で注文",
+      subtitle:
+        "テーブルのメニューブックなどに載っている番号を入力してください。",
+      placeholder: "例: 5",
+      hint: "番号は商品IDと同じです（現在 1〜12）。",
+      submit: "商品へ進む",
+      invalid: "番号が見つかりません。メニューを確認して入力し直してください。",
+      enterHint: "決定または「商品へ進む」を押してください。",
+    },
+    menuDetail: {
+      labelNomor: "メニュー番号",
+      qty: "数量",
+      kurang: "減らす",
+      tambah: "増やす",
+      order: "カートに入れて注文へ",
+      lihatDaftar: "メニュー一覧へ",
+      ketikNomorLagi: "別の番号を入力",
+    },
     menu: {
       title: "メニュー一覧",
       subtitle: "ミナンカバウの厨房から最高の料理をお届けします — 本格的で、やわらかく、風味豊かです。",
+      lewatNomor: "番号で注文 →",
       tambah: "+ 追加",
       kategori: {
         makanan: "🍛 料理",

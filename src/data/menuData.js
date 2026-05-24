@@ -113,6 +113,13 @@ export const menuItems = [
   },
 ];
 
+/** Cari satu item menu berdasarkan `id` (angka sama dengan nomor di buku/menu cetak). */
+export function getMenuById(rawId) {
+  const id = typeof rawId === "string" ? Number.parseInt(rawId, 10) : Number(rawId);
+  if (!Number.isInteger(id) || id < 1) return undefined;
+  return menuItems.find((item) => item.id === id);
+}
+
 export const kategoriLabel = {
   makanan: "🍛 Makanan",
   minuman: "🥤 Minuman",

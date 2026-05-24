@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import Container from "@/components/Container";
 import { menuItems } from "@/data/menuData";
@@ -34,6 +35,14 @@ export default function MenuPage() {
         >
           <h1 className="title">{t("menu.title")}</h1>
           <p className="subtitle">{t("menu.subtitle")}</p>
+          <p className="mt-4">
+            <Link
+              href="/nomor-menu"
+              className="inline-block text-sm text-amber-400 hover:text-amber-300 underline underline-offset-4"
+            >
+              {t("menu.lewatNomor")}
+            </Link>
+          </p>
         </motion.div>
 
         {groupedMenu.map((group, groupIdx) => (

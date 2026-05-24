@@ -4,22 +4,9 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, ShoppingCart } from "lucide-react";
-import {
-  ORDER_TABLE_TOKEN_STORAGE_KEY,
-  ORDER_TOKEN_CHANGED_EVENT,
-} from "@/lib/orderSessionToken";
+import { ORDER_TOKEN_CHANGED_EVENT, getOrderHref } from "@/lib/orderSessionToken";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
-
-function computeOrderHref() {
-  if (typeof window === "undefined") return "/order";
-  try {
-    const secret = sessionStorage.getItem(ORDER_TABLE_TOKEN_STORAGE_KEY)?.trim();
-    return secret ? `/order?t=${encodeURIComponent(secret)}` : "/order";
-  } catch {
-    return "/order";
-  }
-}
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -42,7 +29,7 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    const sync = () => setOrderHref(computeOrderHref());
+    const sync = () => setOrderHref(getOrderHref());
     sync();
     window.addEventListener(ORDER_TOKEN_CHANGED_EVENT, sync);
     window.addEventListener("storage", sync);
@@ -75,6 +62,9 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-8 text-sm font-light">
             <Link href="/menu" className="hover:text-[#F4EAD0] transition">
               {t("nav.menu")}
+            </Link>
+            <Link href="/nomor-menu" className="hover:text-[#F4EAD0] transition">
+              {t("nav.nomorMenu")}
             </Link>
             <Link href="/tentang" className="hover:text-[#F4EAD0] transition">
               {t("nav.tentang")}
@@ -141,6 +131,13 @@ export default function Navbar() {
             className="py-3 border-b border-gray-800 hover:text-[#F4EAD0] transition"
           >
             {t("nav.menu")}
+          </Link>
+          <Link
+            href="/nomor-menu"
+            onClick={() => setIsOpen(false)}
+            className="py-3 border-b border-gray-800 hover:text-[#F4EAD0] transition"
+          >
+            {t("nav.nomorMenu")}
           </Link>
           <Link
             href="/tentang"
