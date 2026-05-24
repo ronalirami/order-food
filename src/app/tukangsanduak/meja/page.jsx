@@ -79,9 +79,7 @@ export default function AdminMejaTokenPage() {
           <div className="mt-8 bg-[#0d0d0d] rounded-xl p-6 border border-gray-800 space-y-5">
             <p className="text-[#a8dc7a] text-sm font-medium">Token baru aktif sampai:</p>
             <p className="text-[#F4EAD0] text-sm">{new Date(result.expires_at).toLocaleString("id-ID")}</p>
-            <p className="text-gray-400 text-xs">
-              QR untuk meja {result.nomor_meja} membuka tamu langsung di halaman <strong className="text-gray-300">ketik nomor menu</strong> (tamu kemudian masuk ke detail dan checkout seperti biasa).
-            </p>
+            <p className="text-gray-400 text-xs">QR untuk meja {result.nomor_meja} — tempel di meja, atau cetak lewat tombol di kotak putih.</p>
             <OrderUrlQr url={result.orderUrl} label={`Meja ${result.nomor_meja}`} />
             <p className="text-gray-500 text-[10px]">Tautan (untuk mengganti generator lain):</p>
             <textarea

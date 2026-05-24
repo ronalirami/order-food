@@ -63,9 +63,6 @@ export default function Navbar() {
             <Link href="/menu" className="hover:text-[#F4EAD0] transition">
               {t("nav.menu")}
             </Link>
-            <Link href="/nomor-menu" className="hover:text-[#F4EAD0] transition">
-              {t("nav.nomorMenu")}
-            </Link>
             <Link href="/tentang" className="hover:text-[#F4EAD0] transition">
               {t("nav.tentang")}
             </Link>
@@ -131,13 +128,6 @@ export default function Navbar() {
             className="py-3 border-b border-gray-800 hover:text-[#F4EAD0] transition"
           >
             {t("nav.menu")}
-          </Link>
-          <Link
-            href="/nomor-menu"
-            onClick={() => setIsOpen(false)}
-            className="py-3 border-b border-gray-800 hover:text-[#F4EAD0] transition"
-          >
-            {t("nav.nomorMenu")}
           </Link>
           <Link
             href="/tentang"
