@@ -39,7 +39,8 @@ export async function rotateOrderTokenForMeja(nomor_meja, request) {
   const base =
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
     `${request.headers.get("x-forwarded-proto") || "http"}://${request.headers.get("host") || "localhost:3000"}`;
-  const orderUrl = `${base}/order?t=${encodeURIComponent(inserted.secret)}`;
+  /** Tamu pertama kali dapat layar ketik nomor menu; keranjang/konfirmasi tetap di `/order`. */
+  const orderUrl = `${base}/nomor-menu?t=${encodeURIComponent(inserted.secret)}`;
 
   return {
     nomor_meja: inserted.nomor_meja,
@@ -79,6 +80,6 @@ export async function getStableOrderUrlForMeja(nomor_meja, request) {
     nomor_meja: meja,
     secret: data.secret,
     expires_at: data.expires_at,
-    orderUrl: `${base}/order?t=${encodeURIComponent(data.secret)}`,
+    orderUrl: `${base}/nomor-menu?t=${encodeURIComponent(data.secret)}`,
   };
 }
