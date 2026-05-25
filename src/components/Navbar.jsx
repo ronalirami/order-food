@@ -23,9 +23,9 @@ export default function Navbar() {
     { code: "ja", flag: "🇯🇵" },
   ];
 
-  /** Di halaman order (biasanya dari QR meja): sembunyikan Tentang — logo pakai URL order (+ token meja jika ada), bukan beranda. */
+  /** Di `/order` (alur QR): logo ke katalog menu, bukan ke beranda — token meja tetap di penyimpanan tab. */
   const isOrderTunnel = pathname === "/order";
-  const brandHref = isOrderTunnel ? orderHref : "/";
+  const brandHref = isOrderTunnel ? "/menu" : "/";
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
