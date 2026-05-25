@@ -9,6 +9,9 @@ import {
   ORDER_TABLE_TOKEN_STORAGE_KEY,
   ORDER_TOKEN_CHANGED_EVENT,
 } from "@/lib/orderSessionToken";
+import {
+  OPEN_ORDER_MOBILE_CART_EVENT,
+} from "@/lib/orderMobileCartUi";
 import { menuItems } from "@/data/menuData";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -16,6 +19,80 @@ import { useLanguage } from "@/context/LanguageContext";
 function notifyOrderTokenChanged() {
   if (typeof window === "undefined") return;
   window.dispatchEvent(new Event(ORDER_TOKEN_CHANGED_EVENT));
+}
+
+/** Isi kartu keranjang + total + tombol konfirmasi — dipakai sidebar desktop & bottom sheet mobile. */
+function OrderCartPanelContent({
+  t,
+  formatYen,
+  cart,
+  totalHarga,
+  increaseQty,
+  decreaseQty,
+  removeFromCart,
+  onKonfirmasi,
+}) {
+  return (
+    <>
+      <h2 className="text-2xl font-serif text-[#F4EAD0] mb-4">{t("order.keranjang")}</h2>
+
+      {cart.length === 0 ? (
+        <p className="text-gray-400">{t("order.belumAda")}</p>
+      ) : (
+        <div className="space-y-5">
+          {cart.map((item) => (
+            <div key={item.id} className="border-b border-gray-700 pb-4">
+              <div className="flex justify-between">
+                <p className="font-medium">{item.nama}</p>
+                <button
+                  type="button"
+                  onClick={() => removeFromCart(item.id)}
+                  className="text-red-400 hover:text-red-600 text-sm"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="flex justify-between items-center mt-2">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => decreaseQty(item.id)}
+                    className="px-2 bg-gray-700 rounded hover:bg-gray-600"
+                  >
+                    −
+                  </button>
+                  <span>{item.qty}</span>
+                  <button
+                    type="button"
+                    onClick={() => increaseQty(item.id)}
+                    className="px-2 bg-gray-700 rounded hover:bg-gray-600"
+                  >
+                    +
+                  </button>
+                </div>
+                <p className="text-[#F4EAD0]">¥{formatYen(item.harga * item.qty)}</p>
+              </div>
+            </div>
+          ))}
+
+          <div className="border-t border-gray-700 pt-4 flex justify-between">
+            <span className="text-gray-400">{t("order.total")}</span>
+            <span className="text-[#F4EAD0] font-semibold">¥{formatYen(totalHarga)}</span>
+          </div>
+
+          <motion.button
+            type="button"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onKonfirmasi}
+            className="w-full bg-[#F4EAD0] text-black py-3 rounded-lg mt-4 font-medium hover:bg-white transition"
+          >
+            {t("order.konfirmasi")}
+          </motion.button>
+        </div>
+      )}
+    </>
+  );
 }
 
 export default function OrderPageClient() {
@@ -37,6 +114,8 @@ export default function OrderPageClient() {
   const [pesananDikirim, setPesananDikirim] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const [mobileCartOpen, setMobileCartOpen] = useState(false);
 
   const verifyToken = useCallback(async (token) => {
     setGateLoading(true);
@@ -94,6 +173,23 @@ export default function OrderPageClient() {
     verifyToken(rawToken);
   }, [rawToken, verifyToken]);
 
+  /** Navbar (mobile): buka drawer keranjang dari ikon trolley. */
+  useEffect(() => {
+    if (!rawToken || !gateOk) return;
+    const open = () => setMobileCartOpen(true);
+    window.addEventListener(OPEN_ORDER_MOBILE_CART_EVENT, open);
+    return () => window.removeEventListener(OPEN_ORDER_MOBILE_CART_EVENT, open);
+  }, [rawToken, gateOk]);
+
+  useEffect(() => {
+    if (!mobileCartOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [mobileCartOpen]);
+
   /** Buka /order dari bookmark tanpa ?t — pakai token tab ini jika ada. */
   useEffect(() => {
     if (rawToken.trim()) return;
@@ -142,6 +238,7 @@ export default function OrderPageClient() {
         setShowModal(false);
         setPesananDikirim(false);
         setNamaPemesan("");
+        setMobileCartOpen(false);
       }, 2800);
     } catch (err) {
       setError(err.message);
@@ -149,6 +246,11 @@ export default function OrderPageClient() {
       setIsLoading(false);
     }
   };
+
+  function openKonfirmasiFromCart() {
+    setMobileCartOpen(false);
+    setShowModal(true);
+  }
 
   const formatYen = (number) => new Intl.NumberFormat("ja-JP").format(number);
 
@@ -213,72 +315,96 @@ export default function OrderPageClient() {
               viewport={{ once: true }}
               className="flex gap-6 mb-10 border-b border-gray-800 pb-6"
             >
-              <div className="relative w-32 h-24 rounded-lg overflow-hidden">
+              <div className="relative w-32 h-24 rounded-lg overflow-hidden shrink-0">
                 <Image src={item.gambar} alt={item.nama} fill className="object-cover" />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <h3 className="text-xl font-semibold text-[#F4EAD0]">{item.nama}</h3>
                 <p className="text-gray-400 text-sm">{item.deskripsi}</p>
                 <p className="text-[#F4EAD0] mt-2 font-medium">¥{formatYen(item.harga)}</p>
               </div>
-              <button type="button" onClick={() => addToCart(item)} className="bg-[#F4EAD0] text-black px-4 py-2 rounded-lg hover:bg-white transition self-center">
+              <button type="button" onClick={() => addToCart(item)} className="bg-[#F4EAD0] text-black px-4 py-2 rounded-lg hover:bg-white transition self-center shrink-0">
                 {t("order.pesan")}
               </button>
             </motion.div>
           ))}
         </div>
 
-        <div
-          id="order-keranjang"
-          className="w-full md:w-1/3 bg-[#111] p-6 rounded-2xl h-fit md:sticky md:top-16 shadow-lg scroll-mt-28 md:scroll-mt-0"
-        >
-          <h2 className="text-2xl font-serif text-[#F4EAD0] mb-4">{t("order.keranjang")}</h2>
-
-          {cart.length === 0 ? (
-            <p className="text-gray-400">{t("order.belumAda")}</p>
-          ) : (
-            <div className="space-y-5">
-              {cart.map((item) => (
-                <div key={item.id} className="border-b border-gray-700 pb-4">
-                  <div className="flex justify-between">
-                    <p className="font-medium">{item.nama}</p>
-                    <button type="button" onClick={() => removeFromCart(item.id)} className="text-red-400 hover:text-red-600 text-sm">
-                      ✕
-                    </button>
-                  </div>
-                  <div className="flex justify-between items-center mt-2">
-                    <div className="flex items-center gap-3">
-                      <button type="button" onClick={() => decreaseQty(item.id)} className="px-2 bg-gray-700 rounded hover:bg-gray-600">
-                        −
-                      </button>
-                      <span>{item.qty}</span>
-                      <button type="button" onClick={() => increaseQty(item.id)} className="px-2 bg-gray-700 rounded hover:bg-gray-600">
-                        +
-                      </button>
-                    </div>
-                    <p className="text-[#F4EAD0]">¥{formatYen(item.harga * item.qty)}</p>
-                  </div>
-                </div>
-              ))}
-
-              <div className="border-t border-gray-700 pt-4 flex justify-between">
-                <span className="text-gray-400">{t("order.total")}</span>
-                <span className="text-[#F4EAD0] font-semibold">¥{formatYen(totalHarga)}</span>
-              </div>
-
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowModal(true)}
-                className="w-full bg-[#F4EAD0] text-black py-3 rounded-lg mt-4 font-medium hover:bg-white transition"
-              >
-                {t("order.konfirmasi")}
-              </motion.button>
-            </div>
-          )}
+        {/* Desktop: panel keranjang di samping */}
+        <div className="hidden md:block w-full md:w-1/3 bg-[#111] p-6 rounded-2xl h-fit md:sticky md:top-16 shadow-lg">
+          <OrderCartPanelContent
+            t={t}
+            formatYen={formatYen}
+            cart={cart}
+            totalHarga={totalHarga}
+            increaseQty={increaseQty}
+            decreaseQty={decreaseQty}
+            removeFromCart={removeFromCart}
+            onKonfirmasi={openKonfirmasiFromCart}
+          />
         </div>
       </div>
+
+      {/* Mobile: bottom sheet keranjang (ikon di navbar membuka ini) */}
+      <AnimatePresence>
+        {mobileCartOpen ? (
+          <motion.div
+            key="mobile-cart-sheet"
+            className="fixed inset-0 z-[60] md:hidden flex flex-col justify-end"
+            role="presentation"
+          >
+            <motion.button
+              type="button"
+              aria-label="Tutup"
+              className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileCartOpen(false)}
+            />
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="mobile-cart-heading"
+              className="relative z-10 bg-[#111] rounded-t-2xl shadow-2xl max-h-[85vh] flex flex-col overflow-hidden pb-6 max-[480px]:pb-8"
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 320 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="shrink-0 flex justify-between items-center px-6 pt-4 pb-3 border-b border-gray-800">
+                <h2 id="mobile-cart-heading" className="text-xl font-serif text-[#F4EAD0]">
+                  {t("order.keranjang")}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setMobileCartOpen(false)}
+                  className="text-gray-400 hover:text-white p-2 -mr-2 text-2xl leading-none"
+                  aria-label="Tutup"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="overflow-y-auto flex-1 p-6 min-h-0">
+                {/* Judul utama sudah di header sheets; sisanya sama dengan sidebar */}
+                <div className="[&>h2]:hidden">
+                  <OrderCartPanelContent
+                    t={t}
+                    formatYen={formatYen}
+                    cart={cart}
+                    totalHarga={totalHarga}
+                    increaseQty={increaseQty}
+                    decreaseQty={decreaseQty}
+                    removeFromCart={removeFromCart}
+                    onKonfirmasi={openKonfirmasiFromCart}
+                  />
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
       <AnimatePresence>
         {showModal && (
@@ -286,7 +412,7 @@ export default function OrderPageClient() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4"
+            className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center px-4"
             onClick={(e) => e.target === e.currentTarget && setShowModal(false)}
           >
             <motion.div
@@ -294,7 +420,7 @@ export default function OrderPageClient() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ duration: 0.3 }}
-              className="bg-[#111] rounded-2xl p-8 w-full max-w-md shadow-2xl"
+              className="bg-[#111] rounded-2xl p-8 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto"
             >
               {pesananDikirim ? (
                 <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-6">

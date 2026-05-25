@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, ShoppingCart } from "lucide-react";
 import { ORDER_TOKEN_CHANGED_EVENT, getOrderHref } from "@/lib/orderSessionToken";
+import { requestOpenOrderMobileCart } from "@/lib/orderMobileCartUi";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -43,12 +44,6 @@ export default function Navbar() {
     };
   }, [pathname]);
 
-  function scrollToOrderCart() {
-    const el = document.getElementById("order-keranjang");
-    el?.scrollIntoView({ behavior: "smooth", block: "start" });
-    setIsOpen(false);
-  }
-
   return (
     <header
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
@@ -72,7 +67,10 @@ export default function Navbar() {
           {isOrderTunnel ? (
             <button
               type="button"
-              onClick={scrollToOrderCart}
+              onClick={() => {
+                requestOpenOrderMobileCart();
+                setIsOpen(false);
+              }}
               className="md:hidden relative flex items-center justify-center rounded-md p-2 text-amber-500 hover:text-amber-300 transition shrink-0"
               style={{ border: "1px solid rgba(255,255,255,0.3)" }}
               aria-label={t("order.keranjang")}
