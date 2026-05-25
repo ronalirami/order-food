@@ -228,7 +228,10 @@ export default function OrderPageClient() {
           ))}
         </div>
 
-        <div className="w-full md:w-1/3 bg-[#111] p-6 rounded-2xl h-fit sticky top-16 shadow-lg">
+        <div
+          id="order-keranjang"
+          className="w-full md:w-1/3 bg-[#111] p-6 rounded-2xl h-fit md:sticky md:top-16 shadow-lg scroll-mt-28 md:scroll-mt-0"
+        >
           <h2 className="text-2xl font-serif text-[#F4EAD0] mb-4">{t("order.keranjang")}</h2>
 
           {cart.length === 0 ? (
