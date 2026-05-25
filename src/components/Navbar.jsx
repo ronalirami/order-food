@@ -22,6 +22,10 @@ export default function Navbar() {
     { code: "ja", flag: "🇯🇵" },
   ];
 
+  /** Di halaman order (biasanya dari QR meja): sembunyikan Tentang — logo pakai URL order (+ token meja jika ada), bukan beranda. */
+  const isOrderTunnel = pathname === "/order";
+  const brandHref = isOrderTunnel ? orderHref : "/";
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
@@ -50,7 +54,7 @@ export default function Navbar() {
 
         {/* LOGO + MENU DESKTOP */}
         <div className="flex items-center gap-8">
-          <Link href="/">
+          <Link href={brandHref}>
             <h1
               className="font-serif tracking-widest font-semibold text-purple-300 px-3 py-1 rounded-md"
               style={{ border: "1px solid #d8b4fe", fontSize: "1rem" }}
@@ -63,9 +67,11 @@ export default function Navbar() {
             <Link href="/menu" className="hover:text-[#F4EAD0] transition">
               {t("nav.menu")}
             </Link>
-            <Link href="/tentang" className="hover:text-[#F4EAD0] transition">
-              {t("nav.tentang")}
-            </Link>
+            {!isOrderTunnel ? (
+              <Link href="/tentang" className="hover:text-[#F4EAD0] transition">
+                {t("nav.tentang")}
+              </Link>
+            ) : null}
             <Link
               href={orderHref}
               className="relative flex items-center gap-1 text-amber-500 hover:text-amber-300 transition"
@@ -129,13 +135,15 @@ export default function Navbar() {
           >
             {t("nav.menu")}
           </Link>
-          <Link
-            href="/tentang"
-            onClick={() => setIsOpen(false)}
-            className="py-3 border-b border-gray-800 hover:text-[#F4EAD0] transition"
-          >
-            {t("nav.tentang")}
-          </Link>
+          {!isOrderTunnel ? (
+            <Link
+              href="/tentang"
+              onClick={() => setIsOpen(false)}
+              className="py-3 border-b border-gray-800 hover:text-[#F4EAD0] transition"
+            >
+              {t("nav.tentang")}
+            </Link>
+          ) : null}
           <Link
             href={orderHref}
             onClick={() => setIsOpen(false)}
