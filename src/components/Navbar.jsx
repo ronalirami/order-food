@@ -64,28 +64,49 @@ export default function Navbar() {
             </h1>
           </Link>
 
-          {isOrderTunnel ? (
-            <button
-              type="button"
-              onClick={() => {
-                requestOpenOrderMobileCart();
-                setIsOpen(false);
-              }}
-              className="md:hidden relative flex items-center justify-center rounded-md p-2 text-amber-500 hover:text-amber-300 transition shrink-0"
-              style={{ border: "1px solid rgba(255,255,255,0.3)" }}
-              aria-label={t("order.keranjang")}
-            >
-              <ShoppingCart className="w-5 h-5" />
-              {totalItem > 0 ? (
-                <span
-                  className="absolute bg-red-500 text-white rounded-full flex items-center justify-center font-bold leading-none min-w-[18px] h-[18px] px-0.5"
-                  style={{ fontSize: "10px", top: "-4px", right: "-4px" }}
-                >
-                  {totalItem > 99 ? "99+" : totalItem}
-                </span>
-              ) : null}
-            </button>
-          ) : null}
+          {/* Mobile: keranjang selalu di samping logo (checkout / atau buka sheet di /order). Desktop: tautan Order di blok nav. */}
+          <div className="md:hidden">
+            {isOrderTunnel ? (
+              <button
+                type="button"
+                onClick={() => {
+                  requestOpenOrderMobileCart();
+                  setIsOpen(false);
+                }}
+                className="relative flex items-center justify-center rounded-md p-2 text-amber-500 hover:text-amber-300 transition shrink-0"
+                style={{ border: "1px solid rgba(255,255,255,0.3)" }}
+                aria-label={t("order.keranjang")}
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {totalItem > 0 ? (
+                  <span
+                    className="absolute bg-red-500 text-white rounded-full flex items-center justify-center font-bold leading-none min-w-[18px] h-[18px] px-0.5"
+                    style={{ fontSize: "10px", top: "-4px", right: "-4px" }}
+                  >
+                    {totalItem > 99 ? "99+" : totalItem}
+                  </span>
+                ) : null}
+              </button>
+            ) : (
+              <Link
+                href={orderHref}
+                onClick={() => setIsOpen(false)}
+                className="relative flex items-center justify-center rounded-md p-2 text-amber-500 hover:text-amber-300 transition shrink-0"
+                style={{ border: "1px solid rgba(255,255,255,0.3)" }}
+                aria-label={t("nav.order")}
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {totalItem > 0 ? (
+                  <span
+                    className="absolute bg-red-500 text-white rounded-full flex items-center justify-center font-bold leading-none min-w-[18px] h-[18px] px-0.5"
+                    style={{ fontSize: "10px", top: "-4px", right: "-4px" }}
+                  >
+                    {totalItem > 99 ? "99+" : totalItem}
+                  </span>
+                ) : null}
+              </Link>
+            )}
+          </div>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-light">
             <Link href="/menu" className="hover:text-[#F4EAD0] transition">
@@ -159,15 +180,6 @@ export default function Navbar() {
           >
             {t("nav.menu")}
           </Link>
-          {!isOrderTunnel ? (
-            <Link
-              href="/tentang"
-              onClick={() => setIsOpen(false)}
-              className="py-3 border-b border-gray-800 hover:text-[#F4EAD0] transition"
-            >
-              {t("nav.tentang")}
-            </Link>
-          ) : null}
           <Link
             href={orderHref}
             onClick={() => setIsOpen(false)}
