@@ -23,9 +23,9 @@ export default function Navbar() {
     { code: "ja", flag: "🇯🇵" },
   ];
 
-  /** Di `/order` (alur QR): logo ke katalog menu, bukan ke beranda — token meja tetap di penyimpanan tab. */
+  /** Logo RM. Lamak selalu mengarah ke menu katalog — tidak ke beranda (`/`). */
   const isOrderTunnel = pathname === "/order";
-  const brandHref = isOrderTunnel ? "/menu" : "/";
+  const brandHref = "/menu";
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
