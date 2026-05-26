@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { Minus, Plus, Trash2, X } from "lucide-react";
 import {
   ORDER_TABLE_TOKEN_STORAGE_KEY,
   ORDER_TOKEN_CHANGED_EVENT,
@@ -37,55 +38,75 @@ function OrderCartPanelContent({
       <h2 className="text-2xl font-serif text-[#F4EAD0] mb-4">{t("order.keranjang")}</h2>
 
       {cart.length === 0 ? (
-        <p className="text-gray-400">{t("order.belumAda")}</p>
+        <p className="text-gray-400 text-sm">{t("order.belumAda")}</p>
       ) : (
-        <div className="space-y-5">
+        <div className="space-y-3">
           {cart.map((item) => (
-            <div key={item.id} className="border-b border-gray-700 pb-4">
-              <div className="flex justify-between">
-                <p className="font-medium">{item.nama}</p>
+            <article
+              key={item.id}
+              className="rounded-xl bg-gradient-to-br from-zinc-900/90 to-neutral-950/90 border border-zinc-800/90 p-4 shadow-inner shadow-black/20"
+            >
+              <div className="flex items-start gap-3">
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold text-[#F4EAD0] text-[15px] leading-snug pr-1">{item.nama}</h3>
+                  <p className="mt-2 text-[11px] tracking-wide text-zinc-500">
+                    {t("order.satuan")} ¥{formatYen(item.harga)}
+                  </p>
+                </div>
                 <button
                   type="button"
                   onClick={() => removeFromCart(item.id)}
-                  className="text-red-400 hover:text-red-600 text-sm"
+                  className="flex shrink-0 items-center gap-1.5 rounded-lg border border-red-500/25 bg-red-950/55 px-2.5 py-2 text-xs font-medium text-red-200 hover:bg-red-900/65 hover:border-red-400/40 active:scale-[0.97] transition"
+                  aria-label={t("order.hapusItemAria")}
                 >
-                  ✕
+                  <Trash2 className="size-3.5 stroke-[2.25]" aria-hidden />
+                  <span>{t("order.hapusItem")}</span>
                 </button>
               </div>
-              <div className="flex justify-between items-center mt-2">
-                <div className="flex items-center gap-3">
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                <div
+                  className="inline-flex items-center rounded-full bg-black/50 border border-zinc-700/90 p-0.5 shadow-sm"
+                >
                   <button
                     type="button"
                     onClick={() => decreaseQty(item.id)}
-                    className="px-2 bg-gray-700 rounded hover:bg-gray-600"
+                    className="flex size-9 items-center justify-center rounded-full text-zinc-300 hover:bg-zinc-800 hover:text-[#F4EAD0] transition"
+                    aria-label={t("order.kurangiQty")}
                   >
-                    −
+                    <Minus className="size-4" strokeWidth={2.25} />
                   </button>
-                  <span>{item.qty}</span>
+                  <span className="min-w-[2rem] px-2 text-center text-sm font-semibold tabular-nums text-[#F4EAD0]">
+                    {item.qty}
+                  </span>
                   <button
                     type="button"
                     onClick={() => increaseQty(item.id)}
-                    className="px-2 bg-gray-700 rounded hover:bg-gray-600"
+                    className="flex size-9 items-center justify-center rounded-full text-zinc-300 hover:bg-zinc-800 hover:text-[#F4EAD0] transition"
+                    aria-label={t("order.tambahQty")}
                   >
-                    +
+                    <Plus className="size-4" strokeWidth={2.25} />
                   </button>
                 </div>
-                <p className="text-[#F4EAD0]">¥{formatYen(item.harga * item.qty)}</p>
+                <p className="text-base font-semibold tracking-tight text-amber-100/95 tabular-nums">
+                  ¥{formatYen(item.harga * item.qty)}
+                </p>
               </div>
-            </div>
+            </article>
           ))}
 
-          <div className="border-t border-gray-700 pt-4 flex justify-between">
-            <span className="text-gray-400">{t("order.total")}</span>
-            <span className="text-[#F4EAD0] font-semibold">¥{formatYen(totalHarga)}</span>
+          <div className="mt-6 flex justify-between rounded-lg border border-zinc-700/70 bg-black/35 px-4 py-3">
+            <span className="text-sm font-medium text-zinc-400">{t("order.total")}</span>
+            <span className="font-serif text-lg font-semibold text-[#F4EAD0] tabular-nums">
+              ¥{formatYen(totalHarga)}
+            </span>
           </div>
 
           <motion.button
             type="button"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={onKonfirmasi}
-            className="w-full bg-[#F4EAD0] text-black py-3 rounded-lg mt-4 font-medium hover:bg-white transition"
+            className="mt-5 w-full rounded-xl bg-gradient-to-r from-[#e8dcb8] via-[#F4EAD0] to-[#e8dcb8] py-3.5 text-[15px] font-semibold text-black shadow-lg shadow-black/30 ring-1 ring-white/20 hover:brightness-105 transition"
           >
             {t("order.konfirmasi")}
           </motion.button>
@@ -373,17 +394,17 @@ export default function OrderPageClient() {
               transition={{ type: "spring", damping: 28, stiffness: 320 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="shrink-0 flex justify-between items-center px-6 pt-4 pb-3 border-b border-gray-800">
+              <div className="shrink-0 flex justify-between items-center px-6 pt-4 pb-3 border-b border-zinc-800/80">
                 <h2 id="mobile-cart-heading" className="text-xl font-serif text-[#F4EAD0]">
                   {t("order.keranjang")}
                 </h2>
                 <button
                   type="button"
                   onClick={() => setMobileCartOpen(false)}
-                  className="text-gray-400 hover:text-white p-2 -mr-2 text-2xl leading-none"
-                  aria-label="Tutup"
+                  className="flex size-10 items-center justify-center rounded-full text-zinc-400 hover:bg-white/10 hover:text-white transition"
+                  aria-label={t("order.tutup")}
                 >
-                  ✕
+                  <X className="size-5 stroke-[2.5]" aria-hidden />
                 </button>
               </div>
               <div className="overflow-y-auto flex-1 p-6 min-h-0">
@@ -436,8 +457,13 @@ export default function OrderPageClient() {
                 <>
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="text-xl font-serif text-[#F4EAD0]">{t("order.modalTitle")}</h3>
-                    <button type="button" onClick={() => setShowModal(false)} className="text-gray-500 hover:text-white transition text-xl">
-                      ✕
+                    <button
+                      type="button"
+                      onClick={() => setShowModal(false)}
+                      className="flex size-10 items-center justify-center rounded-full text-zinc-500 hover:bg-white/10 hover:text-white transition"
+                      aria-label={t("order.tutup")}
+                    >
+                      <X className="size-5 stroke-[2.5]" aria-hidden />
                     </button>
                   </div>
 
